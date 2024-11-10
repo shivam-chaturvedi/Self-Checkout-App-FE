@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import BubbleAnimation from '../components/BubbleAnimation';
 
-const LoginPage = () => {
+const LoginPage = ({setIsLoggedIn}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const navigate=useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         // Basic validation for email and password
@@ -17,9 +19,34 @@ const LoginPage = () => {
         }
 
         // Proceed with form submission (you can send a request to the server here)
-        console.log("Form submitted", { email, password });
-        setError('');
-    };
+            try {
+                const res = await fetch("http://localhost:8080/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",  // Set correct Content-Type for JSON
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+        
+                const data = await res.json();  // Make sure to await the JSON response
+    
+        
+                if (res.ok) {
+                    localStorage.setItem("jwt_token",data.success);
+                    setIsLoggedIn(true);
+                    navigate('/');  // Navigate to login page on success
+                    setError('');  // Clear any error messages
+                } else {
+                    setError(data.error || "An error occurred");  // Display the error from the response
+                }
+            } catch (error) {
+                console.error(error);
+                setError(error.message || "An unexpected error occurred");  // Handle any unexpected errors
+            }
+        };
 
     return (
         <>
@@ -28,8 +55,8 @@ const LoginPage = () => {
             <BubbleAnimation /> {/* Bubble animation component */}
 
             <section className="absolute z-10 top-0 left-0 w-full h-full flex items-center justify-center">
-                <div className="relative w-full max-w-md bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4 z-20">
-                    <Link to="/" className="flex items-center mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
+                <div className="relative w-full max-w-md bg-transparent rounded-lg shadow-md  dark:border-gray-700 p-6 space-y-4 z-20">
+                    <Link to="/" className="bg-green-300 max-w-fit p-2 rounded-md flex items-center mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
                         <img className="w-8 h-8 mr-2" src="/favicon.ico" alt="logo" />
                         Retail Edge
                     </Link>
@@ -82,7 +109,7 @@ const LoginPage = () => {
                         </button>
 
                         {/* Sign-up Redirect */}
-                        <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                        <p className="text-sm font-light text-blue-800 bg-gray-200 p-2 rounded-full dark:text-gray-400">
                             Don't have an account?{' '}
                             <Link to="/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
                                 Create one here

@@ -1,13 +1,13 @@
 // Navbar.js
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { checkAuth } from '../utils/auth';  
 import { useLocation } from 'react-router-dom';
 
-const Navbar = ({ exclude = [] }) => {
+const Navbar = ({ exclude = [] ,isLoggedIn}) => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const location = useLocation();
+
 
     // Check if the current path is in the exclude list
     if (exclude.includes(location.pathname)) {
@@ -18,7 +18,6 @@ const Navbar = ({ exclude = [] }) => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
 
-    const isLoggedIn = checkAuth(); // Check if user is logged in
 
     return (
         <nav className="bg-orange-300 p-4 shadow-lg">
@@ -36,7 +35,6 @@ const Navbar = ({ exclude = [] }) => {
                         <>
                             <Link to="/" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Home</Link>
                             <Link to="/admin" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Admin</Link>
-                            <Link to="/products" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Products</Link>
                             <Link to="/cart" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Cart</Link>
                             <Link to="/profile" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Profile</Link>
                             <Link to="/logout" className="text-white hover:bg-red-600 px-4 py-2 rounded transition">Logout</Link>
@@ -65,7 +63,6 @@ const Navbar = ({ exclude = [] }) => {
                         <>
                             <Link to="/" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Home</Link>
                             <Link to="/admin" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Admin</Link>
-                            <Link to="/products" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Products</Link>
                             <Link to="/cart" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Cart</Link>
                             <Link to="/profile" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Profile</Link>
                             <Link to="/logout" className="block text-white hover:bg-red-600 px-4 py-2 rounded transition">Logout</Link>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const BubbleAnimation = () => {
   return (
-    <div className="absolute z-10 w-full h-screen bg-[#00b4ff] overflow-hidden">
+    <div className="absolute z-10 w-full h-screen bg-[#d8932bc1] overflow-hidden">
       {/* Bubble 1 */}
       <div className="absolute rounded-full w-48 h-48 bg-gradient-radial from-white/30 to-transparent shadow-[0_20px_30px_rgba(0,0,0,0.2),inset_0px_10px_30px_5px_rgba(255,255,255,1)] animate-bubble1 left-[-10%] top-[10%] scale-60"></div>
       

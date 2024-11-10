@@ -11,7 +11,7 @@ const HomePage = () => {
                     <p className="mt-4 text-gray-700 text-lg">
                         Experience seamless, queue-free shopping with our self-checkout app. 
                     </p>
-                    <Link to="/get-started" className="mt-6 inline-block bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition">
+                    <Link to="/cart" className="mt-6 inline-block bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition">
                         Get Started
                     </Link>
                 </div>
