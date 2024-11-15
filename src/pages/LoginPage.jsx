@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, {  useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BubbleAnimation from '../components/BubbleAnimation';
+import { BACKEND_SERVER_URL } from '../utils/config';
 
 const LoginPage = ({setIsLoggedIn}) => {
     const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ const LoginPage = ({setIsLoggedIn}) => {
 
         // Proceed with form submission (you can send a request to the server here)
             try {
-                const res = await fetch("http://localhost:8080/login", {
+                const res = await fetch(`${BACKEND_SERVER_URL}/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",  // Set correct Content-Type for JSON

@@ -39,7 +39,7 @@ const App = () => {
                 <Route path="/cart" element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />} />
                 <Route path="/logout" element={isLoggedIn ? <LogoutPage setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" />} />
-                <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                <Route path="/login" element={isLoggedIn ? <Navigate to="/"/> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/404" element={<NotFoundPage />} />
                 <Route path="*" element={<Navigate to="/404" />} />
