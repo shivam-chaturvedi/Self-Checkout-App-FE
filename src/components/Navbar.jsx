@@ -20,7 +20,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
 
 
     return (
-        <nav className="bg-orange-300 p-4 shadow-lg">
+        <nav className="bg-[#C6E7FF] p-4 shadow-lg">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">
@@ -29,15 +29,15 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                 </Link>
 
                 {/* Navigation Links */}
-                <div className="hidden md:flex space-x-4">
+                <div className="hidden md:flex space-x-4 text-black">
                     {isLoggedIn ? (
                         // Default Navbar for Logged In Users
                         <>
-                            <Link to="/" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Home</Link>
-                            <Link to="/admin" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Admin</Link>
-                            <Link to="/cart" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Cart</Link>
-                            <Link to="/profile" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Profile</Link>
-                            <Link to="/logout" className="text-white hover:bg-red-600 px-4 py-2 rounded transition">Logout</Link>
+                            <Link to="/" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Home</Link>
+                            <Link to="/admin" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Admin</Link>
+                            <Link to="/cart" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Cart</Link>
+                            <Link to="/profile" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Profile</Link>
+                            <Link to="/logout" className=" hover:bg-[#d84343] hover:text-white px-4 py-2 rounded transition">Logout</Link>
                         </>
                     ) : (
                         // Navbar for Logged Out Users

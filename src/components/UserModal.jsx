@@ -67,10 +67,11 @@ export default function UserModal({ isOpen, setIsOpen, newUser, setNewUser, hand
               onChange={handleRoleChange}
               className="border rounded px-3 py-2 w-full"
             >
-              <option value="">--Select Role--</option>
+              <option value="" defaultValue={""} disabled>--Select Role--</option>
               <option value="ADMIN">Admin</option>
               <option value="MANAGER">Manager</option>
               <option value="STAFF">Staff</option>
+              <option value="USER">User</option>
             </select>
             {roleError && (
               <p className="text-red-500 text-sm mt-1">Please select a valid role.</p>

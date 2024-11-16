@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
     return (
-        <div className="bg-gray-100 min-h-screen flex flex-col">
+        <div className="bg-[#FFDDAE] min-h-screen flex flex-col">
             {/* Hero Section */}
-            <section className="bg-white py-16">
+            <section className="bg-[#FFDDAE] py-16">
                 <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold text-green-600">Welcome to Retail Edge</h2>
+                    <h2 className="text-3xl font-bold text-[#141715eb]">Welcome to Retail Edge</h2>
                     <p className="mt-4 text-gray-700 text-lg">
                         Experience seamless, queue-free shopping with our self-checkout app. 
                     </p>
-                    <Link to="/cart" className="mt-6 inline-block bg-green-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition">
+                    <Link to="/cart" className="mt-6 inline-block bg-[#de9d42] text-white px-6 py-3 rounded-full font-semibold hover:bg-green-600 transition">
                         Get Started
                     </Link>
                 </div>
@@ -51,7 +51,7 @@ const HomePage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="bg-green-500 text-white py-6 mt-auto">
+            <footer className="bg-[#D4F6FF] text-black py-6 mt-auto">
                 <div className="container mx-auto px-6 text-center">
                     <p className="mb-2">&copy; 2024 Retail Edge. All Rights Reserved.</p>
                     <div className="flex justify-center space-x-4">

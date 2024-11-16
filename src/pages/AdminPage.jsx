@@ -20,7 +20,7 @@ export default function AdminPage() {
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
-    role: "USER", // Default role
+    role: "", // Default role
   });
 
   // Fetch products and users from the backend
@@ -158,7 +158,7 @@ export default function AdminPage() {
 
   const handleAddUser = () => {
     setEditingUser(null);
-    setNewUser({ email: "", password: "", role: "USER" });
+    setNewUser({ email: "", password: "", role: "" });
     setIsUserModalOpen(true);
   };
 
@@ -190,57 +190,63 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {users && users.length!==0?
-      (
-      <div className="overflow-x-auto bg-white shadow rounded-lg mb-4">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2 px-4 text-left">Created At</th>
-              <th className="py-2 px-4 text-left">Updated At</th>
-              <th className="py-2 px-4 text-left">Email</th>
-              <th className="py-2 px-4 text-left">Password</th>
-              <th className="py-2 px-4 text-left">Role</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!users && users.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="py-4 px-4 text-center text-gray-500">
-                  No Users Found
-                </td>
+      {/* table data */}
+      {users.length > 0 ? (
+        <div className="overflow-x-auto bg-white shadow rounded-lg mb-4">
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 px-4 text-left">Created At</th>
+                <th className="py-2 px-4 text-left">Updated At</th>
+                <th className="py-2 px-4 text-left">Email</th>
+                <th className="py-2 px-4 text-left">Password</th>
+                <th className="py-2 px-4 text-left">Role</th>
+                <th className="py-2 px-4 text-left">Actions</th>
               </tr>
-            ): (
-              !users && users.map((user) => (
-                <tr key={user.email} className="border-b">
-                  <td className="py-2 px-4">{user.createdAt}</td>
-                  <td className="py-2 px-4">{user.updatedAt}</td>
-                  <td className="py-2 px-4">{user.email}</td>
-                  <td className="py-2 px-4">{user.password}</td>
-                  <td className="py-2 px-4">{user.role}</td>
-                  <td className="py-2 px-4 flex space-x-2">
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="bg-yellow-500 text-white py-1 px-3 rounded flex items-center"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.email)}
-                      className="bg-red-600 text-white py-1 px-3 rounded flex items-center"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+            </thead>
+            <tbody>
+              {Array.isArray(users) && users.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="py-4 px-4 text-center text-gray-500"
+                  >
+                    No Users Found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-      ):(
-        <h1>No Users Found</h1>
+              ) : (
+                users.length > 0 &&
+                users.map((user) => (
+                  <tr key={user.email} className="border-b">
+                    <td className="py-2 px-4">{user.createdAt}</td>
+                    <td className="py-2 px-4">{user.updatedAt}</td>
+                    <td className="py-2 px-4">{user.email}</td>
+                    <td className="py-2 px-4">
+                      {user.password.slice(6, 20) + "..."}
+                    </td>
+                    <td className="py-2 px-4">{user.role}</td>
+                    <td className="py-2 px-4 flex space-x-2">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="bg-yellow-500 text-white py-1 px-3 rounded flex items-center"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.email)}
+                        className="bg-red-600 text-white py-1 px-3 rounded flex items-center"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <h1 className="mx-auto text-lg text-gray-400">No User Found</h1>
       )}
 
       {/* Product Table Section */}
@@ -259,10 +265,16 @@ export default function AdminPage() {
         <table className="min-w-full table-auto">
           <thead>
             <tr className="border-b">
+              
+            <th className="py-2 px-4 text-left">ID</th>
+            <th className="py-2 px-4 text-left">Created At</th>
+              <th className="py-2 px-4 text-left">Updated At</th>
               <th className="py-2 px-4 text-left">Name</th>
               <th className="py-2 px-4 text-left">Price</th>
               <th className="py-2 px-4 text-left">Category</th>
               <th className="py-2 px-4 text-left">Quantity</th>
+              <th className="py-2 px-4 text-left">Available</th>
+              <th className="py-2 px-4 text-left">QR Code</th>
               <th className="py-2 px-4 text-left">Actions</th>
             </tr>
           </thead>
@@ -282,10 +294,18 @@ export default function AdminPage() {
             ) : (
               products.map((product) => (
                 <tr key={product.id} className="border-b">
+                  
+                  <td className="py-2 px-4">{product.id}</td>
+                  <td className="py-2 px-4">{product.createdAt}</td>
+                  <td className="py-2 px-4">{product.updatedAt}</td>
                   <td className="py-2 px-4">{product.name}</td>
-                  <td className="py-2 px-4">{product.price}</td>
+                  <td className="py-2 px-4">${product.price}</td>
                   <td className="py-2 px-4">{product.category}</td>
                   <td className="py-2 px-4">{product.quantity}</td>
+                  <td className="py-2 px-4">
+                    <img src={`${BACKEND_SERVER_URL}/admin/product/qr/${product.id}`} alt="qr code"/>
+                    </td>
+                  <td className="py-2 px-4">{product.available?"YES":"NO"}</td>
                   <td className="py-2 px-4 flex space-x-2">
                     <button
                       onClick={() => handleEditProduct(product)}
