@@ -1,145 +1,189 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import React, { useEffect, useRef, useState } from 'react';
+import { BrowserBarcodeReader } from '@zxing/library';
+import { BACKEND_SERVER_URL } from '../utils/config';
 
 const CartPage = () => {
-  const [cameras, setCameras] = useState([]);
-  const [selectedCameraId, setSelectedCameraId] = useState('');
-  const [items, setItems] = useState({});
-  const [scanTimeout, setScanTimeout] = useState(false); // Boolean to control scan debounce
-  const qrCodeReader = useRef(null);
-  const audioRef = useRef(new Audio('/beep.wav'));
+  const videoRef = useRef(null); // Reference to the video element
+  const [result, setResult] = useState('Waiting for a barcode...');
+  const [error, setError] = useState('');
+  const [devices, setDevices] = useState([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState('');
+  const [scannedItems, setScannedItems] = useState([]); // State to hold scanned items
 
-  // Load available cameras on component mount
   useEffect(() => {
-    Html5Qrcode.getCameras()
-      .then((devices) => setCameras(devices))
-      .catch((err) => console.error("Error loading cameras:", err));
-  }, []);
+    const fetchDevices = async () => {
+      const codeReader = new BrowserBarcodeReader();
 
-  // Start scanning when a camera is selected
-  useEffect(() => {
-    if (selectedCameraId && !qrCodeReader.current) {
-      qrCodeReader.current = new Html5Qrcode("qr-reader");
-      qrCodeReader.current.start(
-        selectedCameraId,
-        { fps: 1, qrbox: 250 },
-        handleScanSuccess,
-        (error) => console.warn("QR scanning failed:", error)
-      ).catch((err) => console.error("Error starting scanner:", err));
-    }
+      try {
+        const videoDevices = await codeReader.getVideoInputDevices();
+        setDevices(videoDevices);
 
-    return () => {
-      if (qrCodeReader.current) {
-        qrCodeReader.current.stop().then(() => {
-          qrCodeReader.current = null;
-        }).catch((err) => console.error("Error stopping scanner:", err));
+        // Set default camera to back camera or the first available one
+        const backCamera = videoDevices.find((device) =>
+          device.label.toLowerCase().includes('back') ||
+          device.label.toLowerCase().includes('rear')
+        );
+        setSelectedDeviceId(backCamera ? backCamera.deviceId : videoDevices[0]?.deviceId);
+      } catch (err) {
+        console.error(err);
+        setError(`Error fetching camera devices: ${err.message}`);
       }
     };
-  }, [selectedCameraId]);
 
-  // Handle successful scan with a debounce to prevent multiple scans
-  const handleScanSuccess = (item) => {
-    if (!scanTimeout) {
-      audioRef.current.play();
-      addItemToCart(item);
+    fetchDevices();
+  }, []);
 
-      // Set a timeout to prevent immediate re-trigger
-      setScanTimeout(true);
-      setTimeout(() => setScanTimeout(false), 1000); // Clear after 1 second
-    }
-  };
+  useEffect(() => {
+    if (!selectedDeviceId) return;
 
-  // Add or update scanned item in cart
-  const addItemToCart = (item) => {
-    setItems((prevItems) => {
-      const updatedItems = { ...prevItems };
-      if (updatedItems[item]) {
-        updatedItems[item].quantity += 1;
-      } else {
-        updatedItems[item] = {
-          name: item,
-          quantity: 1,
-          price: (Math.random() * (100 - 10) + 10).toFixed(2),
-        };
+    const startBarcodeScanner = async () => {
+      const codeReader = new BrowserBarcodeReader();
+
+      try {
+        codeReader.decodeFromVideoDevice(
+          selectedDeviceId,
+          videoRef.current,
+          async (result, err) => {
+            if (result) {
+              setResult(`Barcode detected: ${result.text}`);
+              try {
+                const res = await fetch(`${BACKEND_SERVER_URL}/product/get/${result.text}`, {
+                  headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                  },
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  // Check if the product already exists in the scannedItems list
+                  setScannedItems((prevItems) => {
+                    if (!prevItems.some(item => item.id === data.id)) {
+                      return [...prevItems, data];
+                    }
+                    return prevItems; // Do not add if it already exists
+                  });
+                  console.log(data);
+                }
+              } catch (error) {
+                console.warn(error);
+              }
+              setError('');
+            } else if (err && err.name !== 'NotFoundException') {
+              console.error(err);
+              setError('Error: Could not detect barcode. Ensure it is in view.');
+            }
+          }
+        );
+      } catch (err) {
+        console.error(err);
+        setError(`Error starting barcode scanner: ${err.message}`);
       }
-      return updatedItems;
-    });
-  };
 
-  // Remove or decrement item quantity with single action per click
-  const deleteItem = (itemName) => {
-    setItems((prevItems) => {
-      const updatedItems = { ...prevItems };
-      if (updatedItems[itemName].quantity > 1) {
-        updatedItems[itemName].quantity -= 1;
-      } else {
-        delete updatedItems[itemName];
-      }
-      return updatedItems;
-    });
+      return () => {
+        codeReader.reset(); // Clean up when the component unmounts
+      };
+    };
+
+    startBarcodeScanner();
+  }, [selectedDeviceId]);
+
+  const handleDeviceChange = (e) => {
+    setSelectedDeviceId(e.target.value);
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      <div className="container mx-auto flex-grow p-6">
-        <h2 className="text-center text-xl font-semibold mb-4">Select Camera</h2>
-        
-        <select
-          className="block w-1/2 mx-auto p-3 border border-gray-300 rounded"
-          onChange={(e) => setSelectedCameraId(e.target.value)}
-        >
-          <option value="">Select a camera</option>
-          {cameras.map((camera, index) => (
-            <option key={camera.id} value={camera.id}>
-              {camera.label || `Camera ${index + 1}`}
-            </option>
-          ))}
-        </select>
+    <div
+      style={{
+        textAlign: 'center',
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#f4f4f9',
+        minHeight: '100vh',
+        padding: '20px',
+      }}
+    >
+      <h1 style={{ fontSize: '24px', margin: '20px 0' }}>Back Camera Barcode Scanner</h1>
 
-        <div className="reader mt-8 border-2 border-dashed border-green-500 rounded-lg p-2 flex items-center justify-center">
-          <div id="qr-reader" style={{ width: "100%" }}></div>
-        </div>
+      {/* Camera selection dropdown */}
+      <select
+        value={selectedDeviceId}
+        onChange={handleDeviceChange}
+        style={{
+          marginBottom: '20px',
+          padding: '10px',
+          fontSize: '16px',
+        }}
+      >
+        {devices.map((device) => (
+          <option key={device.deviceId} value={device.deviceId}>
+            {device.label || `Camera ${device.deviceId}`}
+          </option>
+        ))}
+      </select>
 
-        <h3 className="text-center text-lg font-semibold mt-8">Scanned Items</h3>
+      <video
+        ref={videoRef}
+        style={{
+          width: '90%',
+          maxWidth: '600px',
+          margin: '20px auto',
+          border: '3px solid #ddd',
+          borderRadius: '10px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        }}
+        autoPlay
+        playsInline
+      />
 
-        <div className="mt-4 overflow-x-auto">
-          <table className="table-auto w-full text-left bg-white shadow rounded-lg">
+      {/* Scanned items list */}
+      <div className="my-4">
+        <h2 className="text-xl font-semibold">Scanned Items</h2>
+        <div className="overflow-auto" style={{ maxHeight: '50vh' }}>
+          <table className="table-auto w-full text-sm text-left">
             <thead>
-              <tr className="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">Product</th>
-                <th className="py-3 px-6 text-left">Quantity</th>
-                <th className="py-3 px-6 text-left">Price</th>
-                <th className="py-3 px-6 text-center">Actions</th>
+              <tr>
+                <th className="px-4 py-2 border-b">ID</th>
+                <th className="px-4 py-2 border-b">Name</th>
+                <th className="px-4 py-2 border-b">Price</th>
+                <th className="px-4 py-2 border-b">Category</th>
+                <th className="px-4 py-2 border-b">Quantity</th>
+                <th className="px-4 py-2 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {Object.keys(items).length > 0 ? (
-                Object.keys(items).map((item) => (
-                  <tr key={item} className="border-b border-gray-200 hover:bg-gray-100">
-                    <td className="py-3 px-6 text-left">{items[item].name}</td>
-                    <td className="py-3 px-6 text-left">{items[item].quantity}</td>
-                    <td className="py-3 px-6 text-left">${items[item].price}</td>
-                    <td className="py-3 px-6 text-center">
-                      <button
-                        onClick={() => deleteItem(item)}
-                        className="bg-red-500 text-white px-3 py-1 rounded"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center py-3">
-                    No items scanned.
+              {scannedItems.map((item) => (
+                <tr key={item.id}>
+                  <td className="px-4 py-2 border-b">{item.id}</td>
+                  <td className="px-4 py-2 border-b">{item.name}</td>
+                  <td className="px-4 py-2 border-b">{item.price}</td>
+                  <td className="px-4 py-2 border-b">{item.category}</td>
+                  <td className="px-4 py-2 border-b">{item.quantity}</td>
+                  <td className="px-4 py-2 border-b">
+                    <button
+                      onClick={() =>
+                        setScannedItems((prevItems) =>
+                          prevItems.filter((i) => i.id !== item.id)
+                        )
+                      }
+                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      <div className="my-4">
+        <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
+          Checkout
+        </button>
+      </div>
+
+      {/* Display result or error */}
+      <div className="text-lg font-bold">{result}</div>
+      <div className="text-red-600">{error}</div>
     </div>
   );
 };

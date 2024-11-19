@@ -265,9 +265,8 @@ export default function AdminPage() {
         <table className="min-w-full table-auto">
           <thead>
             <tr className="border-b">
-              
-            <th className="py-2 px-4 text-left">ID</th>
-            <th className="py-2 px-4 text-left">Created At</th>
+              <th className="py-2 px-4 text-left">ID</th>
+              <th className="py-2 px-4 text-left">Created At</th>
               <th className="py-2 px-4 text-left">Updated At</th>
               <th className="py-2 px-4 text-left">Name</th>
               <th className="py-2 px-4 text-left">Price</th>
@@ -294,7 +293,6 @@ export default function AdminPage() {
             ) : (
               products.map((product) => (
                 <tr key={product.id} className="border-b">
-                  
                   <td className="py-2 px-4">{product.id}</td>
                   <td className="py-2 px-4">{product.createdAt}</td>
                   <td className="py-2 px-4">{product.updatedAt}</td>
@@ -303,9 +301,16 @@ export default function AdminPage() {
                   <td className="py-2 px-4">{product.category}</td>
                   <td className="py-2 px-4">{product.quantity}</td>
                   <td className="py-2 px-4">
-                    <img src={`${BACKEND_SERVER_URL}/admin/product/qr/${product.id}`} alt="qr code"/>
-                    </td>
-                  <td className="py-2 px-4">{product.available?"YES":"NO"}</td>
+                    {product.available ? "YES" : "NO"}
+                  </td>
+                  <td className="py-2 px-4 w-10 h-10">
+                    <a href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}>
+                      <img
+                        src={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}
+                        alt="qr code"
+                      />
+                    </a>
+                  </td>
                   <td className="py-2 px-4 flex space-x-2">
                     <button
                       onClick={() => handleEditProduct(product)}
