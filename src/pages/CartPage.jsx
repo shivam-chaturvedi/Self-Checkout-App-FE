@@ -1,15 +1,80 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BrowserBarcodeReader } from '@zxing/library';
-import { BACKEND_SERVER_URL } from '../utils/config';
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserBarcodeReader } from "@zxing/library";
+import { BACKEND_SERVER_URL } from "../utils/config";
+import localforage from "localforage"; // For IndexedDB support
+import Checkout from "../components/Checkout";
 
 const CartPage = () => {
   const videoRef = useRef(null); // Reference to the video element
-  const [result, setResult] = useState('Waiting for a barcode...');
-  const [error, setError] = useState('');
+  // eslint-disable-next-line
+  const [result, setResult] = useState("Waiting for a barcode...");
+  const [error, setError] = useState("");
   const [devices, setDevices] = useState([]);
-  const [selectedDeviceId, setSelectedDeviceId] = useState('');
+  const [selectedDeviceId, setSelectedDeviceId] = useState("");
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [checkoutModal, setCheckoutModal] = useState(false);
+
   const [scannedItems, setScannedItems] = useState([]); // State to hold scanned items
 
+  // Save scanned items to IndexedDB
+  const saveItemsToIndexedDB = async (items) => {
+    await localforage.setItem("scannedItems", items);
+  };
+
+  // Load items from IndexedDB
+  const loadItemsFromIndexedDB = async () => {
+    const items = await localforage.getItem("scannedItems");
+    if (items) {
+      setScannedItems(items);
+      updateTotalPrice(items);
+    }
+  };
+
+  // Clear IndexedDB
+
+  // eslint-disable-next-line
+  const clearIndexedDB = async () => {
+    await localforage.removeItem("scannedItems");
+  };
+
+  // Update total price
+  const updateTotalPrice = (items) => {
+    const total = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    setTotalPrice(total.toFixed(2));
+  };
+
+  // Handle checkout button
+  const handleCheckout = async () => {
+    let sum = 0;
+    scannedItems.forEach((item) => {
+      sum += item.price * item.quantity;
+    });
+    setTotalPrice(sum.toFixed(2));
+    setCheckoutModal(true);
+
+    // // Clear IndexedDB after checkout
+
+    // await clearIndexedDB();
+    // setScannedItems([]); // Clear the state as well
+  };
+
+  // Handle deleting an item
+  const handleDeleteItem = (item) => {
+    if (item.quantity > 1) {
+      setScannedItems((prevItems) =>
+        prevItems.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
+        )
+      );
+    } else {
+      setScannedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
+    }
+  };
+
+  // Effect for device selection
   useEffect(() => {
     const fetchDevices = async () => {
       const codeReader = new BrowserBarcodeReader();
@@ -17,13 +82,14 @@ const CartPage = () => {
       try {
         const videoDevices = await codeReader.getVideoInputDevices();
         setDevices(videoDevices);
-
-        // Set default camera to back camera or the first available one
-        const backCamera = videoDevices.find((device) =>
-          device.label.toLowerCase().includes('back') ||
-          device.label.toLowerCase().includes('rear')
+        const backCamera = videoDevices.find(
+          (device) =>
+            device.label.toLowerCase().includes("back") ||
+            device.label.toLowerCase().includes("rear")
         );
-        setSelectedDeviceId(backCamera ? backCamera.deviceId : videoDevices[0]?.deviceId);
+        setSelectedDeviceId(
+          backCamera ? backCamera.deviceId : videoDevices[0]?.deviceId
+        );
       } catch (err) {
         console.error(err);
         setError(`Error fetching camera devices: ${err.message}`);
@@ -33,9 +99,9 @@ const CartPage = () => {
     fetchDevices();
   }, []);
 
+  // Start the barcode scanner
   useEffect(() => {
     if (!selectedDeviceId) return;
-
     const startBarcodeScanner = async () => {
       const codeReader = new BrowserBarcodeReader();
 
@@ -47,29 +113,49 @@ const CartPage = () => {
             if (result) {
               setResult(`Barcode detected: ${result.text}`);
               try {
-                const res = await fetch(`${BACKEND_SERVER_URL}/product/get/${result.text}`, {
-                  headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
-                  },
-                });
+                const res = await fetch(
+                  `${BACKEND_SERVER_URL}/product/get/${result.text}`,
+                  {
+                    headers: {
+                      Authorization:
+                        "Bearer " + localStorage.getItem("jwt_token"),
+                    },
+                  }
+                );
                 const data = await res.json();
                 if (res.ok) {
-                  // Check if the product already exists in the scannedItems list
+                  await new Audio("beep.wav").play();
+
                   setScannedItems((prevItems) => {
-                    if (!prevItems.some(item => item.id === data.id)) {
-                      return [...prevItems, data];
+                    const existingItem = prevItems.find(
+                      (item) => item.id === data.id
+                    );
+                    let updatedItems;
+                    if (existingItem) {
+                      updatedItems = prevItems.map((item) =>
+                        item.id === data.id
+                          ? { ...item, quantity: item.quantity + 1 }
+                          : item
+                      );
+                    } else {
+                      updatedItems = [...prevItems, { ...data, quantity: 1 }];
                     }
-                    return prevItems; // Do not add if it already exists
+
+                    // Save the updated items to IndexedDB
+                    saveItemsToIndexedDB(updatedItems);
+
+                    return updatedItems;
                   });
-                  console.log(data);
                 }
               } catch (error) {
                 console.warn(error);
               }
-              setError('');
-            } else if (err && err.name !== 'NotFoundException') {
+              setError("");
+            } else if (err && err.name !== "NotFoundException") {
               console.error(err);
-              setError('Error: Could not detect barcode. Ensure it is in view.');
+              setError(
+                "Error: Could not detect barcode. Ensure it is in view."
+              );
             }
           }
         );
@@ -79,12 +165,18 @@ const CartPage = () => {
       }
 
       return () => {
-        codeReader.reset(); // Clean up when the component unmounts
+        codeReader.reset();
       };
     };
 
     startBarcodeScanner();
   }, [selectedDeviceId]);
+
+  // Load items from IndexedDB on component mount
+  useEffect(() => {
+    loadItemsFromIndexedDB();
+    // eslint-disable-next-line
+  }, []);
 
   const handleDeviceChange = (e) => {
     setSelectedDeviceId(e.target.value);
@@ -93,24 +185,24 @@ const CartPage = () => {
   return (
     <div
       style={{
-        textAlign: 'center',
-        fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#f4f4f9',
-        minHeight: '100vh',
-        padding: '20px',
+        textAlign: "center",
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: "#f4f4f9",
+        minHeight: "100vh",
+        padding: "20px",
       }}
     >
-      <h1 style={{ fontSize: '24px', margin: '20px 0' }}>Back Camera Barcode Scanner</h1>
+      {checkoutModal ? (
+        <Checkout setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
+      ) : null}
+      <h1 style={{ fontSize: "24px", margin: "20px 0" }}>
+        Back Camera Barcode Scanner
+      </h1>
 
-      {/* Camera selection dropdown */}
       <select
         value={selectedDeviceId}
         onChange={handleDeviceChange}
-        style={{
-          marginBottom: '20px',
-          padding: '10px',
-          fontSize: '16px',
-        }}
+        style={{ marginBottom: "20px", padding: "10px", fontSize: "16px" }}
       >
         {devices.map((device) => (
           <option key={device.deviceId} value={device.deviceId}>
@@ -122,21 +214,20 @@ const CartPage = () => {
       <video
         ref={videoRef}
         style={{
-          width: '90%',
-          maxWidth: '600px',
-          margin: '20px auto',
-          border: '3px solid #ddd',
-          borderRadius: '10px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          width: "90%",
+          maxWidth: "600px",
+          margin: "20px auto",
+          border: "3px solid #ddd",
+          borderRadius: "10px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         }}
         autoPlay
         playsInline
       />
 
-      {/* Scanned items list */}
       <div className="my-4">
         <h2 className="text-xl font-semibold">Scanned Items</h2>
-        <div className="overflow-auto" style={{ maxHeight: '50vh' }}>
+        <div className="overflow-auto" style={{ maxHeight: "50vh" }}>
           <table className="table-auto w-full text-sm text-left">
             <thead>
               <tr>
@@ -158,11 +249,7 @@ const CartPage = () => {
                   <td className="px-4 py-2 border-b">{item.quantity}</td>
                   <td className="px-4 py-2 border-b">
                     <button
-                      onClick={() =>
-                        setScannedItems((prevItems) =>
-                          prevItems.filter((i) => i.id !== item.id)
-                        )
-                      }
+                      onClick={() => handleDeleteItem(item)}
                       className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
                     >
                       Delete
@@ -176,14 +263,15 @@ const CartPage = () => {
       </div>
 
       <div className="my-4">
-        <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
+        <button
+          onClick={handleCheckout}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
           Checkout
         </button>
       </div>
 
-      {/* Display result or error */}
-      <div className="text-lg font-bold">{result}</div>
-      <div className="text-red-600">{error}</div>
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };

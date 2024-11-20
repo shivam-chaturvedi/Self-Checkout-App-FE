@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import BubbleAnimation from '../components/BubbleAnimation';
 import { BACKEND_SERVER_URL } from '../utils/config';
 
-const LoginPage = ({setIsLoggedIn}) => {
+const LoginPage = ({setIsLoggedIn,setIsAdmin}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -38,6 +38,9 @@ const LoginPage = ({setIsLoggedIn}) => {
                 if (res.ok) {
                     localStorage.setItem("jwt_token",data.success);
                     setIsLoggedIn(true);
+                    if(data.isAdmin){
+                        setIsAdmin(true);
+                    }
                     navigate('/');  // Navigate to login page on success
                     setError('');  // Clear any error messages
                 } else {

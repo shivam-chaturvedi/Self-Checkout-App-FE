@@ -80,7 +80,7 @@ const App = () => {
             isLoggedIn ? (
               <Navigate to="/" />
             ) : (
-              <LoginPage setIsLoggedIn={setIsLoggedIn} />
+              <LoginPage setIsAdmin={setIsAdmin} setIsLoggedIn={setIsLoggedIn} />
             )
           }
         />

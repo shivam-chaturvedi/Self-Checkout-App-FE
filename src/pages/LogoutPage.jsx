@@ -13,6 +13,7 @@ const LogoutPage = ({setIsLoggedIn}) => {
     }
     useEffect(()=>{
         handelLogout();
+    // eslint-disable-next-line
     },[])
 
     return (
