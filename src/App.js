@@ -21,10 +21,11 @@ const App = () => {
   // State to manage login status
   const [isLoggedIn, setIsLoggedIn] = useState(null); // Start with null to indicate loading
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const loggedIn = await checkAuth(setIsAdmin); // Await the result of checkAuth()
+      const loggedIn = await checkAuth(setIsAdmin,setUser); // Await the result of checkAuth()
       setIsLoggedIn(loggedIn);
     };
     checkLoginStatus();
@@ -62,7 +63,7 @@ const App = () => {
         />
         <Route
           path="/profile"
-          element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <ProfilePage user={user} /> : <Navigate to="/login" />}
         />
         <Route
           path="/logout"
@@ -80,7 +81,10 @@ const App = () => {
             isLoggedIn ? (
               <Navigate to="/" />
             ) : (
-              <LoginPage setIsAdmin={setIsAdmin} setIsLoggedIn={setIsLoggedIn} />
+              <LoginPage
+                setIsAdmin={setIsAdmin}
+                setIsLoggedIn={setIsLoggedIn}
+              />
             )
           }
         />

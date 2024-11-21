@@ -20,12 +20,12 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
 
 
     return (
-        <nav className="bg-[#C6E7FF] p-4 shadow-lg text-black">
+        <nav className="bg-[#C6E7FF] p-3">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">
                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
-                    <h1 className="text-white text-2xl font-bold">Retail Edge</h1>
+                    <h1 className="text-white text-2xl font-bold">CityHub</h1>
                 </Link>
 
                 {/* Navigation Links */}
@@ -42,8 +42,8 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                     ) : (
                         // Navbar for Logged Out Users
                         <>
-                            <Link to="/login" className=" hover:bg-[#d6a560]  px-4 py-2 rounded transition">Login</Link>
-                            <Link to="/signup" className=" hover:bg-[#d6a560]  px-4 py-2 rounded transition">Sign Up</Link>
+                            <Link to="/login" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Login</Link>
+                            <Link to="/signup" className="text-white hover:bg-green-600 px-4 py-2 rounded transition">Sign Up</Link>
                         </>
                     )}
                 </div>

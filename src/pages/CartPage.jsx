@@ -63,15 +63,19 @@ const CartPage = () => {
 
   // Handle deleting an item
   const handleDeleteItem = (item) => {
+    let updatedItems;
+
     if (item.quantity > 1) {
-      setScannedItems((prevItems) =>
-        prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
-        )
+      updatedItems = scannedItems.map((i) =>
+        i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
       );
     } else {
-      setScannedItems((prevItems) => prevItems.filter((i) => i.id !== item.id));
+      updatedItems = scannedItems.filter((i) => i.id !== item.id);
     }
+
+    // Update the state and IndexedDB with the new items list
+    setScannedItems(updatedItems);
+    saveItemsToIndexedDB(updatedItems); // Update IndexedDB
   };
 
   // Effect for device selection
@@ -204,8 +208,8 @@ const CartPage = () => {
         onChange={handleDeviceChange}
         style={{ marginBottom: "20px", padding: "10px", fontSize: "16px" }}
       >
-        {devices.map((device) => (
-          <option key={device.deviceId} value={device.deviceId}>
+        {devices.map((device,i) => (
+          <option key={device.deviceId+i} value={device.deviceId}>
             {device.label || `Camera ${device.deviceId}`}
           </option>
         ))}

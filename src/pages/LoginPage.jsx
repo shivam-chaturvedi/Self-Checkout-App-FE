@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import BubbleAnimation from '../components/BubbleAnimation';
 import { BACKEND_SERVER_URL } from '../utils/config';
 
-const LoginPage = ({setIsLoggedIn,setIsAdmin}) => {
+const LoginPage = ({setIsLoggedIn}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -38,9 +38,6 @@ const LoginPage = ({setIsLoggedIn,setIsAdmin}) => {
                 if (res.ok) {
                     localStorage.setItem("jwt_token",data.success);
                     setIsLoggedIn(true);
-                    if(data.isAdmin){
-                        setIsAdmin(true);
-                    }
                     navigate('/');  // Navigate to login page on success
                     setError('');  // Clear any error messages
                 } else {
@@ -62,7 +59,7 @@ const LoginPage = ({setIsLoggedIn,setIsAdmin}) => {
                 <div className="relative w-full max-w-md bg-transparent rounded-lg shadow-md  dark:border-gray-700 p-6 space-y-4 z-20">
                     <Link to="/" className="bg-green-300 max-w-fit p-2 rounded-md flex items-center mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
                         <img className="w-8 h-8 mr-2" src="/favicon.ico" alt="logo" />
-                        Retail Edge
+                        CityHub
                     </Link>
 
                     <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
