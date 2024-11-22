@@ -25,7 +25,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">
                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
-                    <h1 className="text-white text-2xl font-bold">CityHub</h1>
+                    <h1 className="text-white text-2xl font-bold">RetailEdge</h1>
                 </Link>
 
                 {/* Navigation Links */}
