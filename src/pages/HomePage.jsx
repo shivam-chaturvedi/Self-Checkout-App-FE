@@ -86,7 +86,7 @@ const HomePage = () => {
                     <div className="flex flex-wrap justify-center gap-8">
                         <div className="bg-white rounded-lg shadow p-6 w-full md:w-1/3 text-center">
                             <p className="text-gray-600 italic">
-                                "CityHub has made my shopping experience so much faster and easier. I love it!"
+                                "RetailEdge has made my shopping experience so much faster and easier. I love it!"
                             </p>
                             <h4 className="mt-4 font-bold text-gray-800">- Priya Sharma</h4>
                         </div>
@@ -107,10 +107,10 @@ const HomePage = () => {
                     <div className="max-w-4xl mx-auto">
                         <details className="mb-4 border-b pb-2">
                             <summary className="text-lg font-semibold cursor-pointer">
-                                Is CityHub compatible with all devices?
+                                Is RetailEdge compatible with all devices?
                             </summary>
                             <p className="mt-2 text-gray-600">
-                                Yes, CityHub works seamlessly on both Android and iOS devices.
+                                Yes, RetailEdge works seamlessly on both Android and iOS devices.
                             </p>
                         </details>
                         <details className="mb-4 border-b pb-2">
@@ -132,7 +132,7 @@ const HomePage = () => {
                         Ready to Shop Smarter?
                     </h2>
                     <p className="text-gray-700 text-lg mb-6">
-                        Download CityHub today and enjoy a hassle-free shopping experience.
+                        Download RetailEdge today and enjoy a hassle-free shopping experience.
                     </p>
                     <Link 
                         to="/download" 
@@ -146,7 +146,7 @@ const HomePage = () => {
             {/* Footer */}
             <footer className="bg-[#C6E7FF] text-[#141715] py-6">
                 <div className="container mx-auto px-6 text-center">
-                    <p className="mb-2">&copy; 2024 CityHub. All Rights Reserved.</p>
+                    <p className="mb-2">&copy; 2024 RetailEdge. All Rights Reserved.</p>
                     <div className="flex justify-center space-x-4">
                         <Link to="/terms" className="hover:underline text-[#de6c2a]">Terms of Service</Link>
                         <Link to="/privacy" className="hover:underline text-[#de6c2a]">Privacy Policy</Link>
