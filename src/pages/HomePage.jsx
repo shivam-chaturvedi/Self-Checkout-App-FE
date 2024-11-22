@@ -14,7 +14,7 @@ const HomePage = () => {
                 
                 <div className="relative container mx-auto px-6 text-center text-[#141715]">
                     <h1 className="text-5xl font-extrabold leading-tight">
-                        Welcome to <span className="text-[#de6c2a]">CityHub</span>
+                        Welcome to <span className="text-[#de6c2a]">RetailEdge</span>
                     </h1>
                     <p className="mt-6 text-xl text-[#1b1a1a]">
                         Revolutionize your shopping experience with our self-checkout app.

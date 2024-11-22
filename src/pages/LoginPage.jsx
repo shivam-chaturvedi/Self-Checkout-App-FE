@@ -59,7 +59,7 @@ const LoginPage = ({setIsLoggedIn}) => {
                 <div className="relative w-full max-w-md bg-transparent rounded-lg shadow-md  dark:border-gray-700 p-6 space-y-4 z-20">
                     <Link to="/" className="bg-green-300 max-w-fit p-2 rounded-md flex items-center mb-4 text-2xl font-semibold text-gray-900 dark:text-white">
                         <img className="w-8 h-8 mr-2" src="/favicon.ico" alt="logo" />
-                        CityHub
+                        RetailEdge
                     </Link>
 
                     <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
