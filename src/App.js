@@ -59,7 +59,7 @@ const App = () => {
         />
         <Route
           path="/cart"
-          element={isLoggedIn ? <CartPage /> : <Navigate to="/login" />}
+          element={isLoggedIn ? <CartPage  user={user}/> : <Navigate to="/login" />}
         />
         <Route
           path="/profile"

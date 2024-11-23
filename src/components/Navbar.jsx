@@ -20,12 +20,12 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
 
 
     return (
-        <nav className="bg-[#C6E7FF] p-3">
+        <nav className="bg-[#8dd3e0] p-3">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">
                     <img src="/favicon.ico" alt="Logo" className="h-8 w-8" />
-                    <h1 className="text-white text-2xl font-bold">CityHub</h1>
+                    <h1 className="text-white text-2xl font-bold">Retail Edge</h1>
                 </Link>
 
                 {/* Navigation Links */}

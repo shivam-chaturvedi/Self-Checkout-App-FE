@@ -1,10 +1,9 @@
 "use client"
-import { useState } from 'react';
-import { CreditCard, Receipt, Settings, User, ShoppingBag } from 'lucide-react';
+import { Receipt, Settings, User, ShoppingBag } from 'lucide-react';
 
 export default function UserProfile({user}) {
-  const [notifications, setNotifications] = useState(true);
-  const [expressCheckout, setExpressCheckout] = useState(false);
+
+  
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -19,9 +18,7 @@ export default function UserProfile({user}) {
           <p className="text-xl text-gray-500">Member role : {user && user.role}</p>
         </div>
         <div className="flex-grow" />
-        <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200">
-          Edit Profile
-        </button>
+      
       </header>
 
       {/* Tabs */}

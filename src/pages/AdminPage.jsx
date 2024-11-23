@@ -183,16 +183,16 @@ export default function AdminPage() {
         <h2 className="text-xl font-semibold">Users</h2>
         <button
           onClick={handleAddUser}
-          className="bg-green-600 text-white py-2 px-4 rounded flex items-center"
+          className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add User
         </button>
       </div>
 
-      {/* table data */}
-      {users.length > 0 ? (
-        <div className="overflow-x-auto bg-white shadow rounded-lg mb-4">
+      {/* Scrollable User Table */}
+      <div className="overflow-y-scroll h-[50vh] bg-[#c9d2d2] shadow rounded-lg mb-4">
+        {users.length > 0 ? (
           <table className="min-w-full table-auto">
             <thead>
               <tr className="border-b">
@@ -205,112 +205,70 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(users) && users.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="6"
-                    className="py-4 px-4 text-center text-gray-500"
-                  >
-                    No Users Found
+              {users.map((user) => (
+                <tr key={user.email} className="border-b">
+                  <td className="py-2 px-4">{user.createdAt}</td>
+                  <td className="py-2 px-4">{user.updatedAt}</td>
+                  <td className="py-2 px-4">{user.email}</td>
+                  <td className="py-2 px-4">
+                    {user.password.slice(6, 20) + "..."}
+                  </td>
+                  <td className="py-2 px-4">{user.role}</td>
+                  <td className="py-2 px-4 flex space-x-2">
+                    <button
+                      onClick={() => handleEditUser(user)}
+                      className="bg-yellow-500 text-white py-1 px-3 rounded flex items-center"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteUser(user.email)}
+                      className="bg-red-600 text-white py-1 px-3 rounded flex items-center"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </td>
                 </tr>
-              ) : (
-                users.length > 0 &&
-                users.map((user) => (
-                  <tr key={user.email} className="border-b">
-                    <td className="py-2 px-4">{user.createdAt}</td>
-                    <td className="py-2 px-4">{user.updatedAt}</td>
-                    <td className="py-2 px-4">{user.email}</td>
-                    <td className="py-2 px-4">
-                      {user.password.slice(6, 20) + "..."}
-                    </td>
-                    <td className="py-2 px-4">{user.role}</td>
-                    <td className="py-2 px-4 flex space-x-2">
-                      <button
-                        onClick={() => handleEditUser(user)}
-                        className="bg-yellow-500 text-white py-1 px-3 rounded flex items-center"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.email)}
-                        className="bg-red-600 text-white py-1 px-3 rounded flex items-center"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
-        </div>
-      ) : (
-        <h1 className="mx-auto text-lg text-gray-400">No User Found</h1>
-      )}
+        ) : (
+          <h1 className="mx-auto text-lg text-gray-400">No User Found</h1>
+        )}
+      </div>
 
       {/* Product Table Section */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Products</h2>
         <button
           onClick={handleAddProduct}
-          className="bg-green-600 text-white py-2 px-4 rounded flex items-center"
+          className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Product
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white shadow rounded-lg mb-4">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2 px-4 text-left">ID</th>
-              <th className="py-2 px-4 text-left">Created At</th>
-              <th className="py-2 px-4 text-left">Updated At</th>
-              <th className="py-2 px-4 text-left">Name</th>
-              <th className="py-2 px-4 text-left">Price</th>
-              <th className="py-2 px-4 text-left">Category</th>
-              <th className="py-2 px-4 text-left">Quantity</th>
-              <th className="py-2 px-4 text-left">Available</th>
-              <th className="py-2 px-4 text-left">QR Code</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products && products.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                  No Products Found
-                </td>
+      {/* Scrollable Product Table */}
+      <div className="overflow-y-scroll h-[50vh] bg-[#c9d2d2] shadow rounded-lg mb-4">
+        {products.length > 0 ? (
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="border-b">
+                <th className="py-2 px-4 text-left">Product Name</th>
+                <th className="py-2 px-4 text-left">Price</th>
+                <th className="py-2 px-4 text-left">Category</th>
+                <th className="py-2 px-4 text-left">Quantity</th>
+                <th className="py-2 px-4 text-left">Actions</th>
               </tr>
-            ) : !products ? (
-              <tr>
-                <td colSpan="5" className="py-4 px-4 text-center text-gray-500">
-                  Loading products...
-                </td>
-              </tr>
-            ) : (
-              products.map((product) => (
+            </thead>
+            <tbody>
+              {products.map((product) => (
                 <tr key={product.id} className="border-b">
-                  <td className="py-2 px-4">{product.id}</td>
-                  <td className="py-2 px-4">{product.createdAt}</td>
-                  <td className="py-2 px-4">{product.updatedAt}</td>
                   <td className="py-2 px-4">{product.name}</td>
-                  <td className="py-2 px-4">${product.price}</td>
+                  <td className="py-2 px-4">₹{product.price}</td>
                   <td className="py-2 px-4">{product.category}</td>
                   <td className="py-2 px-4">{product.quantity}</td>
-                  <td className="py-2 px-4">
-                    {product.available ? "YES" : "NO"}
-                  </td>
-                  <td className="py-2 px-4 w-10 h-10">
-                    <a href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}>
-                      <img
-                        src={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}
-                        alt="qr code"
-                      />
-                    </a>
-                  </td>
                   <td className="py-2 px-4 flex space-x-2">
                     <button
                       onClick={() => handleEditProduct(product)}
@@ -326,27 +284,29 @@ export default function AdminPage() {
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <h1 className="mx-auto text-lg text-gray-400">No Product Found</h1>
+        )}
       </div>
 
-      {/* Modals for Add/Edit */}
-      <UserModal
-        isOpen={isUserModalOpen}
-        setIsOpen={setIsUserModalOpen}
-        newUser={newUser}
-        setNewUser={setNewUser}
-        handleSaveUser={handleSaveUser}
-      />
-      <ProductModal
-        isOpen={isProductModalOpen}
-        setIsOpen={setIsProductModalOpen}
-        newProduct={newProduct}
-        setNewProduct={setNewProduct}
-        handleSaveProduct={handleSaveProduct}
-      />
+      {/* Modals */}
+      {isProductModalOpen && (
+        <ProductModal
+          onClose={() => setIsProductModalOpen(false)}
+          onSave={handleSaveProduct}
+          product={editingProduct || newProduct}
+        />
+      )}
+      {isUserModalOpen && (
+        <UserModal
+          onClose={() => setIsUserModalOpen(false)}
+          onSave={handleSaveUser}
+          user={editingUser || newUser}
+        />
+      )}
     </div>
   );
 }

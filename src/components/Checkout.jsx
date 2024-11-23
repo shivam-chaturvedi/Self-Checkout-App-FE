@@ -1,13 +1,83 @@
 "use client";
-import { useState } from "react";
-import { CreditCard, Wallet, Building } from "lucide-react";
 
-export default function Checkout({ totalPrice, setCheckoutModal }) {
-  const [paymentMethod, setPaymentMethod] = useState("credit-card");
+import { BACKEND_SERVER_URL } from "../utils/config";
 
-  const handlePayment = () => {
-    console.log("Payment method:", paymentMethod);
-    // Add your payment handling logic here
+const Checkout = ({user, totalPrice, setCheckoutModal }) => {
+
+  // Function to verify the payment status with Razorpay API
+  const verifyPayment = async (paymentId) => {
+    try {
+      const response = await fetch(`${BACKEND_SERVER_URL}/api/verify-payment?payment_id=${paymentId}`,{
+        headers:{
+          "Authorization":`Bearer ${localStorage.getItem("jwt_token")}`
+        }
+      });
+      const paymentDetails = await response.json();
+      if(paymentDetails.ok){
+        console.log(paymentDetails);
+      }
+      else {
+        console.log("Payment verification failed");
+      }
+    } catch (error) {
+      console.error("Error verifying payment", error);
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      // 1. Make an API call to your backend to create an order
+      const response = await fetch(`${BACKEND_SERVER_URL}/api/create-order`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username:user.email,amount: totalPrice }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to create order");
+        return;
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      // 2. Initialize Razorpay payment gateway
+      const options = {
+        key: "rzp_test_VVaxe8RQLNF0DS", // Razorpay Key ID (Should be moved to backend ideally)
+        amount: data.amount, // Amount in paise (Razorpay expects amount in paise)
+        currency: "INR",
+        name: "Retail Edge",
+        description: "Payment for Order",
+        order_id: data.id,
+        handler: function (response) {
+          // alert("Payment Successful: " + response.razorpay_payment_id);
+          setCheckoutModal(false); // Close the modal on success
+          verifyPayment(response.razorpay_payment_id); // Verify payment once completed
+        },
+        prefill: {
+          name: "Customer Name", // You can replace this with dynamic values from user info
+          email: user.email, // You can replace this with dynamic values
+        },
+        theme: {
+          color: "#22c638",
+        },
+        modal: {
+          ondismiss: function () {
+            alert("Payment process was dismissed");
+            setCheckoutModal(false); // Close modal when dismissed
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+
+    } catch (error) {
+      console.error("Error during payment process", error);
+    }
   };
 
   return (
@@ -24,70 +94,7 @@ export default function Checkout({ totalPrice, setCheckoutModal }) {
           <h2 className="text-2xl font-semibold text-center">Checkout</h2>
           <div className="text-center mt-4">
             <p className="text-lg font-medium">Total Amount</p>
-            <p className="text-3xl font-bold text-primary">${totalPrice}</p>
-          </div>
-        </div>
-
-        {/* Payment Method Selection */}
-        <div className="mb-6">
-          <label className="block text-base font-semibold mb-2">
-            Select Payment Method
-          </label>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <input
-                type="radio"
-                value="credit-card"
-                id="credit-card"
-                name="payment-method"
-                checked={paymentMethod === "credit-card"}
-                onChange={() => setPaymentMethod("credit-card")}
-                className="h-5 w-5"
-              />
-              <label
-                htmlFor="credit-card"
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <CreditCard className="h-5 w-5" />
-                <span>Credit/Debit Card</span>
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="radio"
-                value="digital-wallet"
-                id="digital-wallet"
-                name="payment-method"
-                checked={paymentMethod === "digital-wallet"}
-                onChange={() => setPaymentMethod("digital-wallet")}
-                className="h-5 w-5"
-              />
-              <label
-                htmlFor="digital-wallet"
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <Wallet className="h-5 w-5" />
-                <span>Digital Wallet</span>
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="radio"
-                value="bank-transfer"
-                id="bank-transfer"
-                name="payment-method"
-                checked={paymentMethod === "bank-transfer"}
-                onChange={() => setPaymentMethod("bank-transfer")}
-                className="h-5 w-5"
-              />
-              <label
-                htmlFor="bank-transfer"
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <Building className="h-5 w-5" />
-                <span>Bank Transfer</span>
-              </label>
-            </div>
+            <p className="text-3xl font-bold text-primary">₹{totalPrice}</p>
           </div>
         </div>
 
@@ -109,4 +116,6 @@ export default function Checkout({ totalPrice, setCheckoutModal }) {
       </div>
     </div>
   );
-}
+};
+
+export default Checkout;

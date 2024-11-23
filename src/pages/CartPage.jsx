@@ -4,7 +4,7 @@ import { BACKEND_SERVER_URL } from "../utils/config";
 import localforage from "localforage"; // For IndexedDB support
 import Checkout from "../components/Checkout";
 
-const CartPage = () => {
+const CartPage = ({user}) => {
   const videoRef = useRef(null); // Reference to the video element
   // eslint-disable-next-line
   const [result, setResult] = useState("Waiting for a barcode...");
@@ -12,7 +12,7 @@ const CartPage = () => {
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
-  const [checkoutModal, setCheckoutModal] = useState(false);
+  const [checkoutModal, setCheckoutModal] =  useState(false);
 
   const [scannedItems, setScannedItems] = useState([]); // State to hold scanned items
 
@@ -197,7 +197,7 @@ const CartPage = () => {
       }}
     >
       {checkoutModal ? (
-        <Checkout setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
+        <Checkout user={user} setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
       ) : null}
       <h1 style={{ fontSize: "24px", margin: "20px 0" }}>
         Back Camera Barcode Scanner
