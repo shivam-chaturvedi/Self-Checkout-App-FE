@@ -56,7 +56,7 @@ const SignupPage = () => {
 
             <section className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
                 <div className="w-full max-w-md bg-transparent rounded-lg shadow-xl shadow-gray-500 dark:bg-transparent dark:border-gray-700 p-8 space-y-6">
-                    <Link to="/" className="bg-green-300 max-w-fit p-2 rounded-md flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                    <Link to="/" className="max-w-fit p-2 rounded-md flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                         <img className="w-8 h-8 mr-2" src="/favicon.ico" alt="logo" />
                         RetailEdge
                     </Link>
@@ -139,7 +139,7 @@ const SignupPage = () => {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full text-purple-800 bg-green-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                            className="w-full text-purple-800 bg-blue-300 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         >
                             Create an account
                         </button>

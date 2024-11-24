@@ -16,6 +16,7 @@ import { checkAuth } from "./utils/auth"; // Import the checkAuth function
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NotAuthorizedPage from "./pages/NotAuthorizedPage";
+import LoaderComponent from "./components/LoaderComponent";
 
 const App = () => {
   // State to manage login status
@@ -33,7 +34,8 @@ const App = () => {
 
   // Display loading state while checking authentication
   if (isLoggedIn === null) {
-    return <div>Loading...</div>;
+    
+    return <LoaderComponent />;
   }
 
   return (
@@ -82,6 +84,7 @@ const App = () => {
               <Navigate to="/" />
             ) : (
               <LoginPage
+                setUser={setUser}
                 setIsAdmin={setIsAdmin}
                 setIsLoggedIn={setIsLoggedIn}
               />

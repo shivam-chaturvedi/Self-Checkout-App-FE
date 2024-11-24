@@ -15,7 +15,6 @@ const CartPage = ({user}) => {
   const [checkoutModal, setCheckoutModal] =  useState(false);
 
   const [scannedItems, setScannedItems] = useState([]); // State to hold scanned items
-
   // Save scanned items to IndexedDB
   const saveItemsToIndexedDB = async (items) => {
     await localforage.setItem("scannedItems", items);
@@ -197,7 +196,7 @@ const CartPage = ({user}) => {
       }}
     >
       {checkoutModal ? (
-        <Checkout user={user} setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
+        <Checkout User={user} setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
       ) : null}
       <h1 style={{ fontSize: "24px", margin: "20px 0" }}>
         Back Camera Barcode Scanner

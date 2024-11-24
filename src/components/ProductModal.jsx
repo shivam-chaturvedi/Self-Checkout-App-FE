@@ -11,7 +11,7 @@ export default function ProductModal({
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-white p-6 w-10/12 md:w-1/2 rounded-lg shadow-lg">
           <Dialog.Title className="text-2xl font-semibold mb-4">
             {newProduct.id ? "Edit Product" : "Add Product"}
           </Dialog.Title>

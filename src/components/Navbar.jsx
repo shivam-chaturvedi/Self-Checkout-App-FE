@@ -20,7 +20,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
 
 
     return (
-        <nav className="bg-[#8dd3e0] p-3">
+        <nav className="bg-[#254E58] p-3">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">
@@ -29,7 +29,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                 </Link>
 
                 {/* Navigation Links */}
-                <div className="hidden md:flex space-x-4 text-black">
+                <div className="hidden md:flex space-x-4 text-white">
                     {isLoggedIn ? (
                         // Default Navbar for Logged In Users
                         <>
