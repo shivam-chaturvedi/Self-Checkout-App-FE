@@ -28,6 +28,7 @@ const App = () => {
     const checkLoginStatus = async () => {
       const loggedIn = await checkAuth(setIsAdmin,setUser); // Await the result of checkAuth()
       setIsLoggedIn(loggedIn);
+
     };
     checkLoginStatus();
   }, []);

@@ -5,11 +5,11 @@ import { useState } from "react";
 export default function UserProfile({ user }) {
   const [activeTab, setActiveTab] = useState("Transactions"); // Active tab state
   const [visibleTransactions, setVisibleTransactions] = useState(5);
-
   const handleViewMore = () => {
     setVisibleTransactions((prev) => prev + 5);
   };
 
+  
   return (
     <div className="container mx-auto p-4 space-y-6">
       {/* Header */}
@@ -71,7 +71,7 @@ export default function UserProfile({ user }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {user &&
+                    {user!==null &&
                       user.transactions
                         .slice(0, visibleTransactions)
                         .map((transaction) => (

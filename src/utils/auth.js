@@ -9,11 +9,11 @@ export const checkAuth = async (setIsAdmin, setUser) => {
       `${BACKEND_SERVER_URL}/verify-token?token=${token}`
     );
     const data = await res.json();
-    // console.log(data)
+    
     if (res.ok) {
+      setUser(data.user);
       if (data.isAdmin) {
         setIsAdmin(true);
-        setUser(data.user);
       }
       return true;
     } else {

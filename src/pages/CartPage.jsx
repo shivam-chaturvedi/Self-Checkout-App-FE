@@ -4,17 +4,17 @@ import { BACKEND_SERVER_URL } from "../utils/config";
 import localforage from "localforage"; // For IndexedDB support
 import Checkout from "../components/Checkout";
 
-const CartPage = ({user}) => {
+const CartPage = ({ user }) => {
   const videoRef = useRef(null); // Reference to the video element
-  // eslint-disable-next-line
   const [result, setResult] = useState("Waiting for a barcode...");
+
   const [error, setError] = useState("");
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
-  const [checkoutModal, setCheckoutModal] =  useState(false);
-
+  const [checkoutModal, setCheckoutModal] = useState(false);
   const [scannedItems, setScannedItems] = useState([]); // State to hold scanned items
+
   // Save scanned items to IndexedDB
   const saveItemsToIndexedDB = async (items) => {
     await localforage.setItem("scannedItems", items);
@@ -27,13 +27,6 @@ const CartPage = ({user}) => {
       setScannedItems(items);
       updateTotalPrice(items);
     }
-  };
-
-  // Clear IndexedDB
-
-  // eslint-disable-next-line
-  const clearIndexedDB = async () => {
-    await localforage.removeItem("scannedItems");
   };
 
   // Update total price
@@ -53,11 +46,6 @@ const CartPage = ({user}) => {
     });
     setTotalPrice(sum.toFixed(2));
     setCheckoutModal(true);
-
-    // // Clear IndexedDB after checkout
-
-    // await clearIndexedDB();
-    // setScannedItems([]); // Clear the state as well
   };
 
   // Handle deleting an item
@@ -72,9 +60,21 @@ const CartPage = ({user}) => {
       updatedItems = scannedItems.filter((i) => i.id !== item.id);
     }
 
-    // Update the state and IndexedDB with the new items list
     setScannedItems(updatedItems);
     saveItemsToIndexedDB(updatedItems); // Update IndexedDB
+  };
+
+  // Request camera permissions explicitly
+  const requestCameraPermissions = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      stream.getTracks().forEach((track) => track.stop()); // Stop the stream after granting permission
+    } catch (err) {
+      console.error("Camera permission denied:", err);
+      setError("Camera permission is required to scan barcodes.");
+    }
   };
 
   // Effect for device selection
@@ -99,12 +99,14 @@ const CartPage = ({user}) => {
       }
     };
 
-    fetchDevices();
+    // First request permissions, then fetch devices
+    requestCameraPermissions().then(fetchDevices);
   }, []);
 
   // Start the barcode scanner
   useEffect(() => {
     if (!selectedDeviceId) return;
+
     const startBarcodeScanner = async () => {
       const codeReader = new BrowserBarcodeReader();
 
@@ -130,10 +132,12 @@ const CartPage = ({user}) => {
                   await new Audio("beep.wav").play();
 
                   setScannedItems((prevItems) => {
+                    
                     const existingItem = prevItems.find(
                       (item) => item.id === data.id
                     );
                     let updatedItems;
+
                     if (existingItem) {
                       updatedItems = prevItems.map((item) =>
                         item.id === data.id
@@ -144,9 +148,7 @@ const CartPage = ({user}) => {
                       updatedItems = [...prevItems, { ...data, quantity: 1 }];
                     }
 
-                    // Save the updated items to IndexedDB
-                    saveItemsToIndexedDB(updatedItems);
-
+                    saveItemsToIndexedDB(updatedItems); // Save updated items
                     return updatedItems;
                   });
                 }
@@ -178,7 +180,6 @@ const CartPage = ({user}) => {
   // Load items from IndexedDB on component mount
   useEffect(() => {
     loadItemsFromIndexedDB();
-    // eslint-disable-next-line
   }, []);
 
   const handleDeviceChange = (e) => {
@@ -196,7 +197,11 @@ const CartPage = ({user}) => {
       }}
     >
       {checkoutModal ? (
-        <Checkout User={user} setCheckoutModal={setCheckoutModal} totalPrice={totalPrice} />
+        <Checkout
+          User={user}
+          setCheckoutModal={setCheckoutModal}
+          totalPrice={totalPrice}
+        />
       ) : null}
       <h1 style={{ fontSize: "24px", margin: "20px 0" }}>
         Back Camera Barcode Scanner
@@ -207,8 +212,8 @@ const CartPage = ({user}) => {
         onChange={handleDeviceChange}
         style={{ marginBottom: "20px", padding: "10px", fontSize: "16px" }}
       >
-        {devices.map((device,i) => (
-          <option key={device.deviceId+i} value={device.deviceId}>
+        {devices.map((device, i) => (
+          <option key={device.deviceId + i} value={device.deviceId}>
             {device.label || `Camera ${device.deviceId}`}
           </option>
         ))}
@@ -228,6 +233,7 @@ const CartPage = ({user}) => {
         playsInline
       />
 
+      {/* Scanned items table */}
       <div className="my-4">
         <h2 className="text-xl font-semibold">Scanned Items</h2>
         <div className="overflow-auto" style={{ maxHeight: "50vh" }}>
@@ -268,13 +274,11 @@ const CartPage = ({user}) => {
       <div className="my-4">
         <button
           onClick={handleCheckout}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
         >
           Checkout
         </button>
       </div>
-
-      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
