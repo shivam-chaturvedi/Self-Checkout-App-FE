@@ -12,11 +12,11 @@ import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import LogoutPage from "./pages/LogoutPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import { checkAuth } from "./utils/auth"; // Import the checkAuth function
+import { checkAuth } from "./utils/auth"; 
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NotAuthorizedPage from "./pages/NotAuthorizedPage";
-import LoaderComponent from "./components/LoaderComponent";
+import HomeSkeletonScreen from "./components/HomeSkeletonScreen";
 
 const App = () => {
   // State to manage login status
@@ -35,8 +35,7 @@ const App = () => {
 
   // Display loading state while checking authentication
   if (isLoggedIn === null) {
-    
-    return <LoaderComponent />;
+    return <HomeSkeletonScreen />;
   }
 
   return (

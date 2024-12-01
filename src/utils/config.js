@@ -1,4 +1,6 @@
-export const BACKEND_SERVER_URL="http://localhost:8080";
+export const BACKEND_SERVER_URL="https://retail-edge-be-latest.onrender.com";
+
+// https://retail-edge-be-latest.onrender.com/
 
 // const API='https://backend-health-bestie.vercel.app/users/conversations';
 

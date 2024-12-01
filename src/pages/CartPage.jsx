@@ -7,7 +7,6 @@ import Checkout from "../components/Checkout";
 const CartPage = ({ user }) => {
   const videoRef = useRef(null); // Reference to the video element
   const [result, setResult] = useState("Waiting for a barcode...");
-
   const [error, setError] = useState("");
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
@@ -198,6 +197,7 @@ const CartPage = ({ user }) => {
     >
       {checkoutModal ? (
         <Checkout
+          scannedItems={scannedItems}
           User={user}
           setCheckoutModal={setCheckoutModal}
           totalPrice={totalPrice}

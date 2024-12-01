@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import LoaderComponent from "./LoaderComponent";
 
-const Checkout = ({ User, totalPrice, setCheckoutModal }) => {
+const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
   const [loader, setLoader] = useState(false);
 
   // Function to verify the payment status with Razorpay API
@@ -37,8 +37,16 @@ const Checkout = ({ User, totalPrice, setCheckoutModal }) => {
 
   const handlePayment = async () => {
     setLoader(true);
+    const data_to_send = {
+      username: User.email,
+      cart: scannedItems.filter(item => item.id).map(item => ({
+        id: item.id,
+        quantity: item.quantity // Add the quantity to the object
+      })),
+    };
+    
+    // console.log(data_to_send);
     try {
-      // 1. Make an API call to your backend to create an order
       const response = await fetch(`${BACKEND_SERVER_URL}/api/create-order`, {
         method: "POST",
         headers: {
@@ -46,8 +54,10 @@ const Checkout = ({ User, totalPrice, setCheckoutModal }) => {
           "Content-Type": "application/json",
         },
 
-        body: JSON.stringify({ amount: totalPrice, username: User.email }),
+        body: JSON.stringify(data_to_send),
       });
+      const data = await response.json();
+      console.log(data);
 
       if (!response.ok) {
         setLoader(false);
@@ -57,12 +67,10 @@ const Checkout = ({ User, totalPrice, setCheckoutModal }) => {
         setLoader(false);
       }
 
-      const data = await response.json();
-      // console.log(data.transaction_id);
 
       // 2. Initialize Razorpay payment gateway
       const options = {
-        key: "rzp_test_VVaxe8RQLNF0DS", // Razorpay Key ID (Should be moved to backend ideally) this is test api so ignore, this is not a flaw 
+        key: "rzp_test_VVaxe8RQLNF0DS", // Razorpay Key ID (Should be moved to backend ideally) this is test api so ignore, this is not a flaw
         amount: data.amount, // Amount in paise (Razorpay expects amount in paise)
         currency: "INR",
         name: "Retail Edge",
@@ -74,7 +82,7 @@ const Checkout = ({ User, totalPrice, setCheckoutModal }) => {
           verifyPayment(response.razorpay_payment_id, data.transaction_id); // Verify payment once completed
         },
         prefill: {
-          name: "Customer Name", // You can replace this with dynamic values from user info
+          name: User.email, // You can replace this with dynamic values from user info
           email: User.email, // You can replace this with dynamic values
         },
         theme: {
