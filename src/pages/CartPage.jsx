@@ -3,6 +3,7 @@ import { BrowserBarcodeReader } from "@zxing/library";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import localforage from "localforage"; // For IndexedDB support
 import Checkout from "../components/Checkout";
+import Notification from "../components/Notification";
 
 const CartPage = ({ user }) => {
   const videoRef = useRef(null); // Reference to the video element
@@ -131,7 +132,6 @@ const CartPage = ({ user }) => {
                   await new Audio("beep.wav").play();
 
                   setScannedItems((prevItems) => {
-                    
                     const existingItem = prevItems.find(
                       (item) => item.id === data.id
                     );
@@ -195,8 +195,10 @@ const CartPage = ({ user }) => {
         padding: "20px",
       }}
     >
+      
       {checkoutModal ? (
         <Checkout
+          setScannedItems={setScannedItems}
           scannedItems={scannedItems}
           User={user}
           setCheckoutModal={setCheckoutModal}

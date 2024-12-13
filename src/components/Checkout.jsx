@@ -3,9 +3,18 @@
 import { useState } from "react";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import LoaderComponent from "./LoaderComponent";
+import localforage from "localforage";
+import Notification from "./Notification";
 
-const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
+const Checkout = ({
+  scannedItems,
+  User,
+  totalPrice,
+  setCheckoutModal,
+  setScannedItems,
+}) => {
   const [loader, setLoader] = useState(false);
+  const [notify, setNotify] = useState(null);
 
   // Function to verify the payment status with Razorpay API
   // console.log(User);
@@ -22,8 +31,10 @@ const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
         }
       );
       const paymentDetails = await response.json();
-      if (paymentDetails.ok) {
-        // console.log(paymentDetails);
+      if (response.ok) {
+        localforage.clear();
+        setScannedItems([]);
+        console.log(paymentDetails);
         setLoader(false);
       } else {
         console.log("Payment verification failed");
@@ -39,12 +50,14 @@ const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
     setLoader(true);
     const data_to_send = {
       username: User.email,
-      cart: scannedItems.filter(item => item.id).map(item => ({
-        id: item.id,
-        quantity: item.quantity // Add the quantity to the object
-      })),
+      cart: scannedItems
+        .filter((item) => item.id)
+        .map((item) => ({
+          id: item.id,
+          quantity: item.quantity, // Add the quantity to the object
+        })),
     };
-    
+
     // console.log(data_to_send);
     try {
       const response = await fetch(`${BACKEND_SERVER_URL}/api/create-order`, {
@@ -61,12 +74,12 @@ const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
 
       if (!response.ok) {
         setLoader(false);
+        setNotify(data.error);
         console.error("Failed to create order");
         return;
       } else {
         setLoader(false);
       }
-
 
       // 2. Initialize Razorpay payment gateway
       const options = {
@@ -108,10 +121,11 @@ const Checkout = ({ scannedItems, User, totalPrice, setCheckoutModal }) => {
   return (
     <>
       {loader && <LoaderComponent />}
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
         {/* Modal Container */}
         <div className="bg-white shadow-md rounded-lg w-full max-w-lg p-6 mx-4 sm:mx-0">
           {/* Title */}
+          {notify && <Notification message={notify} type="error" setNotify={setNotify} />}
           <h1 className="text-4xl font-bold mb-8 text-primary text-center">
             Retail Edge
           </h1>

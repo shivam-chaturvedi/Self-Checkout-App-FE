@@ -3,6 +3,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
+import LoaderComponent from "../components/LoaderComponent";
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ export default function AdminPage() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [loader, setLoader] = useState(true);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
@@ -25,6 +27,7 @@ export default function AdminPage() {
 
   // Fetch products and users from the backend
   useEffect(() => {
+    setLoader(true);
     fetch(`${BACKEND_SERVER_URL}/product/get-all`, {
       method: "GET",
       headers: {
@@ -33,9 +36,13 @@ export default function AdminPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoader(false);
         setProducts(data);
       })
-      .catch((err) => console.error("Error fetching products:", err));
+      .catch((err) => {
+        console.error("Error fetching products:", err);
+        setLoader(false);
+      });
 
     // Fetch users
     fetch(`${BACKEND_SERVER_URL}/admin/get-all-users`, {
@@ -57,6 +64,7 @@ export default function AdminPage() {
 
   // Add or edit product
   const handleSaveProduct = () => {
+    setLoader(true);
     const method = editingProduct ? "PUT" : "POST";
     const url = editingProduct
       ? `${BACKEND_SERVER_URL}/admin/update/product/${editingProduct.id}`
@@ -75,6 +83,7 @@ export default function AdminPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoader(false);
         if (editingProduct) {
           setProducts(
             products.map((p) => (p.id === editingProduct.id ? data.success : p))
@@ -84,11 +93,15 @@ export default function AdminPage() {
         }
         setIsProductModalOpen(false);
       })
-      .catch((err) => console.error("Error saving product:", err));
+      .catch((err) => {
+        console.error("Error saving product:", err);
+        setLoader(false);
+      });
   };
 
   // Add or edit user
   const handleSaveUser = () => {
+    setLoader(true);
     const method = editingUser ? "PUT" : "POST";
     const url = editingUser
       ? `${BACKEND_SERVER_URL}/admin/update/user`
@@ -104,6 +117,7 @@ export default function AdminPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoader(false);
         console.log(data);
         if (editingUser) {
           setUsers(
@@ -114,11 +128,15 @@ export default function AdminPage() {
         }
         setIsUserModalOpen(false);
       })
-      .catch((err) => console.error("Error saving user:", err));
+      .catch((err) => {
+        console.error("Error saving user:", err);
+        setLoader(false);
+      });
   };
 
   // Delete product
   const handleDeleteProduct = (id) => {
+    setLoader(true);
     fetch(`${BACKEND_SERVER_URL}/admin/product/delete/${id}`, {
       method: "DELETE",
       headers: {
@@ -126,15 +144,20 @@ export default function AdminPage() {
       },
     })
       .then((res) => {
+        setLoader(false);
         if (res.ok) {
           setProducts(products.filter((product) => product.id !== id));
         }
       })
-      .catch((err) => console.error("Error deleting product:", err));
+      .catch((err) => {
+        console.error("Error deleting product:", err);
+        setLoader(false);
+      });
   };
 
   // Delete user
   const handleDeleteUser = (email) => {
+    setLoader(true);
     fetch(`${BACKEND_SERVER_URL}/admin/user/delete/${email}`, {
       method: "DELETE",
       headers: {
@@ -142,11 +165,15 @@ export default function AdminPage() {
       },
     })
       .then((res) => {
+        setLoader(false);
         if (res.ok) {
           setUsers(users.filter((user) => user.email !== email));
         }
       })
-      .catch((err) => console.error("Error deleting user:", err));
+      .catch((err) => {
+        console.error("Error deleting user:", err);
+        setLoader(false);
+      });
   };
 
   // Open modals
@@ -177,189 +204,198 @@ export default function AdminPage() {
   console.log(products);
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+    <>
+      {loader && <LoaderComponent />}
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
-      {/* User Table Section */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Users</h2>
-        <button
-          onClick={handleAddUser}
-          className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add User
-        </button>
-      </div>
+        {/* User Table Section */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Users</h2>
+          <button
+            onClick={handleAddUser}
+            className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add User
+          </button>
+        </div>
 
-      {/* Scrollable User Table */}
-      <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
-        {users.length > 0 ? (
-          <table className="min-w-full table-auto text-white font-bold">
-            {/* Table Header */}
-            <thead>
-              <tr className="border-b border-gray-600 bg-[#1D4046]">
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Created At
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Updated At
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Email
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Password
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Role
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            {/* Table Body */}
-            <tbody>
-              {users.map((user, index) => (
-                <tr
-                  key={user.email}
-                  className={`${
-                    index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
-                  } hover:bg-[#1B3438] font-mono font-light`}
-                >
-                  <td className="py-3 px-4 ">{user.createdAt}</td>
-                  <td className="py-3 px-4 ">{user.updatedAt}</td>
-                  <td className="py-3 px-4 ">{user.email}</td>
-                  <td className="py-3 px-4 ">
-                    {user.password.slice(6, 20)}...
-                  </td>
-                  <td className="py-3 px-4 ">{user.role}</td>
-                  <td className="py-3 px-4 flex space-x-3">
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
-                    >
-                      <Pencil className="h-4 w-4 mr-1" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.email)}
-                      className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" /> Delete
-                    </button>
-                  </td>
+        {/* Scrollable User Table */}
+        <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
+          {users.length > 0 ? (
+            <table className="min-w-full table-auto text-white font-bold">
+              {/* Table Header */}
+              <thead>
+                <tr className="border-b border-gray-600 bg-[#1D4046]">
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Created At
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Updated At
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Email
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Password
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Role
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <h1 className="text-center text-lg text-gray-400 py-4">
-            No Users Found
-          </h1>
-        )}
-      </div>
+              </thead>
 
-      {/* Product Table Section */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-[#ffffff]">Products</h2>
-        <button
-          onClick={handleAddProduct}
-          className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Product
-        </button>
-      </div>
+              {/* Table Body */}
+              <tbody>
+                {users.map((user, index) => (
+                  <tr
+                    key={user.email}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
+                    } hover:bg-[#1B3438] font-mono font-light`}
+                  >
+                    <td className="py-3 px-4 ">{user.createdAt}</td>
+                    <td className="py-3 px-4 ">{user.updatedAt}</td>
+                    <td className="py-3 px-4 ">{user.email}</td>
+                    <td className="py-3 px-4 ">
+                      {user.password.slice(6, 20)}...
+                    </td>
+                    <td className="py-3 px-4 ">{user.role}</td>
+                    <td className="py-3 px-4 flex space-x-3">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
+                      >
+                        <Pencil className="h-4 w-4 mr-1" /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.email)}
+                        className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <h1 className="text-center text-lg text-gray-400 py-4">
+              No Users Found
+            </h1>
+          )}
+        </div>
 
-      {/* Scrollable Product Table */}
-      <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
-        {products.length > 0 ? (
-          <table className="min-w-full table-auto text-white">
-            {/* Table Header */}
-            <thead>
-              <tr className="border-b border-gray-600 bg-[#1D4046]">
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  Product Name
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  Price
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  Category
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  Quantity
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  QR Code
-                </th>
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+        {/* Product Table Section */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-[#ffffff]">Products</h2>
+          <button
+            onClick={handleAddProduct}
+            className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </button>
+        </div>
 
-            {/* Table Body */}
-            <tbody>
-              {products.map((product, index) => (
-                <tr
-                  key={product.id}
-                  className={`${
-                    index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
-                  } hover:bg-[#1B3438] font-mono font-light`}
-                >
-                  <td className="py-3 px-4">{product.name}</td>
-                  <td className="py-3 px-4">₹{product.price}</td>
-                  <td className="py-3 px-4">{product.category}</td>
-                  <td className="py-3 px-4">{product.quantity}</td>
-                  <td className="py-3 px-4">
-                    <a href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}>
-                    <img className="w-10 h-8 " src="/images/qr-scan.jpg" alt="qr code" />
-                    </a>
-                  </td>
-                  
-                  <td className="py-3 px-4 flex space-x-3">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
-                    >
-                      <Pencil className="h-4 w-4 mr-1" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.id)}
-                      className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" /> Delete
-                    </button>
-                  </td>
+        {/* Scrollable Product Table */}
+        <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
+          {products.length > 0 ? (
+            <table className="min-w-full table-auto text-white">
+              {/* Table Header */}
+              <thead>
+                <tr className="border-b border-gray-600 bg-[#1D4046]">
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Product Name
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Price
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Category
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Quantity
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    QR Code
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <h1 className="text-center text-lg text-gray-400 py-4">
-            No Products Found
-          </h1>
-        )}
-      </div>
+              </thead>
 
-      {/* Modals for Add/Edit */}
-      <UserModal
-        isOpen={isUserModalOpen}
-        setIsOpen={setIsUserModalOpen}
-        newUser={newUser}
-        setNewUser={setNewUser}
-        handleSaveUser={handleSaveUser}
-      />
-      <ProductModal
-        isOpen={isProductModalOpen}
-        setIsOpen={setIsProductModalOpen}
-        newProduct={newProduct}
-        setNewProduct={setNewProduct}
-        handleSaveProduct={handleSaveProduct}
-      />
-    </div>
+              {/* Table Body */}
+              <tbody>
+                {products.map((product, index) => (
+                  <tr
+                    key={product.id}
+                    className={`${
+                      index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
+                    } hover:bg-[#1B3438] font-mono font-light`}
+                  >
+                    <td className="py-3 px-4">{product.name}</td>
+                    <td className="py-3 px-4">₹{product.price}</td>
+                    <td className="py-3 px-4">{product.category}</td>
+                    <td className="py-3 px-4">{product.quantity}</td>
+                    <td className="py-3 px-4">
+                      <a
+                        href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}
+                      >
+                        <img
+                          className="w-10 h-8 "
+                          src="/images/qr-scan.jpg"
+                          alt="qr code"
+                        />
+                      </a>
+                    </td>
+
+                    <td className="py-3 px-4 flex space-x-3">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
+                      >
+                        <Pencil className="h-4 w-4 mr-1" /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <h1 className="text-center text-lg text-gray-400 py-4">
+              No Products Found
+            </h1>
+          )}
+        </div>
+
+        {/* Modals for Add/Edit */}
+        <UserModal
+          isOpen={isUserModalOpen}
+          setIsOpen={setIsUserModalOpen}
+          newUser={newUser}
+          setNewUser={setNewUser}
+          handleSaveUser={handleSaveUser}
+        />
+        <ProductModal
+          isOpen={isProductModalOpen}
+          setIsOpen={setIsProductModalOpen}
+          newProduct={newProduct}
+          setNewProduct={setNewProduct}
+          handleSaveProduct={handleSaveProduct}
+        />
+      </div>
+    </>
   );
 }
