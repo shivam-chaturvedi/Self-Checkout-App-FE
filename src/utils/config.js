@@ -1,4 +1,4 @@
-export const BACKEND_SERVER_URL="http://localhost:8080";
+export const BACKEND_SERVER_URL="https://retailedgebe.duckdns.org:8443";
 
 // https://retail-edge-be-latest.onrender.com/
 
