@@ -12,23 +12,24 @@ import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import LogoutPage from "./pages/LogoutPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import { checkAuth } from "./utils/auth"; 
+import { checkAuth } from "./utils/auth";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NotAuthorizedPage from "./pages/NotAuthorizedPage";
 import HomeSkeletonScreen from "./components/HomeSkeletonScreen";
+import UnderDevelopment from "./pages/UnderDevelopment";
 
 const App = () => {
   // State to manage login status
+  const [underDevelopment, setUnderDevelopment] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null); // Start with null to indicate loading
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const loggedIn = await checkAuth(setIsAdmin,setUser); // Await the result of checkAuth()
+      const loggedIn = await checkAuth(setIsAdmin, setUser); // Await the result of checkAuth()
       setIsLoggedIn(loggedIn);
-
     };
     checkLoginStatus();
   }, []);
@@ -40,10 +41,18 @@ const App = () => {
 
   return (
     <Router>
-      <Navbar isLoggedIn={isLoggedIn} exclude={["/login", "/signup", "/404"]} />
+      {!underDevelopment ? (
+        <Navbar
+          isLoggedIn={isLoggedIn}
+          exclude={["/login", "/signup", "/404"]}
+        />
+      ) : null}
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={underDevelopment ? <UnderDevelopment /> : <HomePage />}
+        />
         {/* Protected Routes */}
         <Route
           path="/admin"
@@ -61,11 +70,15 @@ const App = () => {
         />
         <Route
           path="/cart"
-          element={isLoggedIn ? <CartPage  user={user}/> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? <CartPage user={user} /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/profile"
-          element={isLoggedIn ? <ProfilePage user={user} /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? <ProfilePage user={user} /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/logout"

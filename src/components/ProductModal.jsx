@@ -15,50 +15,73 @@ export default function ProductModal({
           <Dialog.Title className="text-2xl font-semibold mb-4">
             {newProduct.id ? "Edit Product" : "Add Product"}
           </Dialog.Title>
+          
+          {/* Product Name Input */}
           <div className="mb-4">
             <label className="block mb-2">Product Name</label>
             <input
               type="text"
-              value={newProduct.name}
+              value={newProduct.name || ""}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, name: e.target.value })
               }
               className="border rounded px-3 py-2 w-full"
             />
           </div>
+          
+          {/* Price Input */}
           <div className="mb-4">
             <label className="block mb-2">Price</label>
             <input
               type="text"
-              value={newProduct.price}
+              value={newProduct.price || ""}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, price: e.target.value })
               }
               className="border rounded px-3 py-2 w-full"
             />
           </div>
+          
+          {/* Category Input */}
           <div className="mb-4">
             <label className="block mb-2">Category</label>
             <input
               type="text"
-              value={newProduct.category}
+              value={newProduct.category || ""}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, category: e.target.value })
               }
               className="border rounded px-3 py-2 w-full"
             />
           </div>
+          
+          {/* Quantity Input */}
           <div className="mb-4">
             <label className="block mb-2">Quantity</label>
             <input
               type="number"
-              value={newProduct.quantity}
+              value={newProduct.quantity || ""}
               onChange={(e) =>
                 setNewProduct({ ...newProduct, quantity: e.target.value })
               }
               className="border rounded px-3 py-2 w-full"
             />
           </div>
+
+          {/* RFID Tag Input */}
+          <div className="mb-4">
+            <label className="block mb-2">RFID Tag</label>
+            <input
+              type="text"
+              value={newProduct.rfidTag || ""}
+              onChange={(e) =>
+                setNewProduct({ ...newProduct, rfidTag: e.target.value })
+              }
+              className="border rounded px-3 py-2 w-full"
+            />
+          </div>
+
+          {/* Buttons */}
           <div className="flex justify-end">
             <button
               onClick={() => setIsOpen(false)}

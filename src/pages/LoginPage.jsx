@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import BubbleAnimation from "../components/BubbleAnimation";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import LoaderComponent from "../components/LoaderComponent";
+import GoogleSignIn from "../components/GoogleSignIn";
 
 const LoginPage = ({ setIsAdmin, setUser, setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
@@ -36,7 +37,7 @@ const LoginPage = ({ setIsAdmin, setUser, setIsLoggedIn }) => {
       });
 
       const data = await res.json(); // Make sure to await the JSON response
-
+      console.log(data);
       if (res.ok) {
         setLoader(false);
         localStorage.setItem("jwt_token", data.success);
@@ -134,6 +135,10 @@ const LoginPage = ({ setIsAdmin, setUser, setIsLoggedIn }) => {
               >
                 Login
               </button>
+
+              {/* OR
+
+              <GoogleSignIn /> */}
 
               {/* Sign-up Redirect */}
               <p className="text-sm font-light text-blue-800 bg-gray-200 p-2 rounded-full dark:text-gray-400">

@@ -3,18 +3,16 @@
 import { useState } from "react";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import LoaderComponent from "./LoaderComponent";
-import localforage from "localforage";
 import Notification from "./Notification";
 
 const Checkout = ({
-  scannedItems,
   User,
-  totalPrice,
   setCheckoutModal,
-  setScannedItems,
+  total
 }) => {
   const [loader, setLoader] = useState(false);
   const [notify, setNotify] = useState(null);
+  const [totalPrice , setTotalPrice]=useState(total);
 
   // Function to verify the payment status with Razorpay API
   // console.log(User);
@@ -32,9 +30,7 @@ const Checkout = ({
       );
       const paymentDetails = await response.json();
       if (response.ok) {
-        localforage.clear();
-        setScannedItems([]);
-        console.log(paymentDetails);
+        // console.log(paymentDetails);
         setLoader(false);
       } else {
         console.log("Payment verification failed");
@@ -48,29 +44,29 @@ const Checkout = ({
 
   const handlePayment = async () => {
     setLoader(true);
-    const data_to_send = {
-      username: User.email,
-      cart: scannedItems
-        .filter((item) => item.id)
-        .map((item) => ({
-          id: item.id,
-          quantity: item.quantity, // Add the quantity to the object
-        })),
-    };
+
+    // dont need this now 
+    // const data_to_send = {
+    //   username: User.email,
+    //   cart: scannedItems
+    //     .filter((item) => item.id)
+    //     .map((item) => ({
+    //       id: item.id,
+    //       quantity: item.quantity, // Add the quantity to the object
+    //     })),
+    // };
 
     // console.log(data_to_send);
     try {
-      const response = await fetch(`${BACKEND_SERVER_URL}/api/create-order`, {
+      const response = await fetch(`${BACKEND_SERVER_URL}/api/create-order/${User.email}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
           "Content-Type": "application/json",
         },
-
-        body: JSON.stringify(data_to_send),
       });
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
 
       if (!response.ok) {
         setLoader(false);
@@ -78,6 +74,7 @@ const Checkout = ({
         console.error("Failed to create order");
         return;
       } else {
+        setTotalPrice(data.amount/100); //to convert amount in paisa to rs 
         setLoader(false);
       }
 
@@ -85,7 +82,7 @@ const Checkout = ({
       const options = {
         key: "rzp_test_VVaxe8RQLNF0DS", // Razorpay Key ID (Should be moved to backend ideally) this is test api so ignore, this is not a flaw
         amount: data.amount, // Amount in paise (Razorpay expects amount in paise)
-        currency: "INR",
+        currency: data.currency,
         name: "Retail Edge",
         description: "Payment for Order",
         order_id: data.id,
@@ -95,8 +92,8 @@ const Checkout = ({
           verifyPayment(response.razorpay_payment_id, data.transaction_id); // Verify payment once completed
         },
         prefill: {
-          name: User.email, // You can replace this with dynamic values from user info
-          email: User.email, // You can replace this with dynamic values
+          email: User.email, // You can replace this with dynamic values from user info
+          name: User.email.split('@')[0], // You can replace this with dynamic values
         },
         theme: {
           color: "#22c638",

@@ -201,7 +201,6 @@ export default function AdminPage() {
     setIsUserModalOpen(true);
   };
 
-  console.log(products);
 
   return (
     <>
@@ -325,6 +324,9 @@ export default function AdminPage() {
                     QR Code
                   </th>
                   <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    RFID Tag
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
                     Actions
                   </th>
                 </tr>
@@ -339,10 +341,10 @@ export default function AdminPage() {
                       index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
                     } hover:bg-[#1B3438] font-mono font-light`}
                   >
-                    <td className="py-3 px-4">{product.name}</td>
-                    <td className="py-3 px-4">₹{product.price}</td>
-                    <td className="py-3 px-4">{product.category}</td>
-                    <td className="py-3 px-4">{product.quantity}</td>
+                    <td className="py-3 px-4">{product.name || 'NA'}</td>
+                    <td className="py-3 px-4">₹{product.price || 'NA'}</td>
+                    <td className="py-3 px-4">{product.category || 'NA'}</td>
+                    <td className="py-3 px-4">{product.quantity || 'NA'}</td>
                     <td className="py-3 px-4">
                       <a
                         href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}
@@ -355,6 +357,7 @@ export default function AdminPage() {
                       </a>
                     </td>
 
+                    <td className="py-3 px-4">{product.rfidTag}</td>
                     <td className="py-3 px-4 flex space-x-3">
                       <button
                         onClick={() => handleEditProduct(product)}
