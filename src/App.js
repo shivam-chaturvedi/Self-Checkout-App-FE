@@ -44,6 +44,7 @@ const App = () => {
       {!underDevelopment ? (
         <Navbar
           isLoggedIn={isLoggedIn}
+          isAdmin={isAdmin}
           exclude={["/login", "/signup", "/404"]}
         />
       ) : null}

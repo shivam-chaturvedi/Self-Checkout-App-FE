@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 
-const Navbar = ({ exclude = [] ,isLoggedIn}) => {
+const Navbar = ({ exclude = [] ,isLoggedIn,isAdmin}) => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const location = useLocation();
@@ -34,7 +34,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                         // Default Navbar for Logged In Users
                         <>
                             <Link to="/" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Home</Link>
-                            <Link to="/admin" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Admin</Link>
+                           {isAdmin? <Link to="/admin" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Admin</Link>:null}
                             <Link to="/cart" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Cart</Link>
                             <Link to="/profile" className=" hover:bg-[#d6a560] px-4 py-2 rounded transition">Profile</Link>
                             <Link to="/logout" className=" hover:bg-[#d84343] hover:text-white px-4 py-2 rounded transition">Logout</Link>
@@ -62,7 +62,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn}) => {
                     {isLoggedIn ? (
                         <>
                             <Link to="/" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Home</Link>
-                            <Link to="/admin" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Admin</Link>
+                            {isAdmin?<Link to="/admin" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Admin</Link>:null}
                             <Link to="/cart" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Cart</Link>
                             <Link to="/profile" className="block text-white hover:bg-green-600 px-4 py-2 rounded transition">Profile</Link>
                             <Link to="/logout" className="block text-white hover:bg-red-600 px-4 py-2 rounded transition">Logout</Link>

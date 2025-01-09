@@ -1,7 +1,7 @@
 // GoogleSignIn.js
 import React from "react";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "./firebase"; // Import Firebase auth instance
+import { auth } from "../utils/firebase";
 
 export default function GoogleSignIn() {
   const signInWithGoogle = () => {

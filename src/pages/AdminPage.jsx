@@ -4,6 +4,7 @@ import { BACKEND_SERVER_URL } from "../utils/config";
 import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
 import LoaderComponent from "../components/LoaderComponent";
+import StoreCartModal from "../components/StoreCartModal";
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
@@ -19,6 +20,7 @@ export default function AdminPage() {
     category: "",
     quantity: "",
   });
+
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
@@ -398,6 +400,7 @@ export default function AdminPage() {
           setNewProduct={setNewProduct}
           handleSaveProduct={handleSaveProduct}
         />
+        
       </div>
     </>
   );
