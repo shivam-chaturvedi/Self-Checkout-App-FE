@@ -120,7 +120,7 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => {
         setLoader(false);
-        console.log(data);
+        // console.log(data);
         if (editingUser) {
           setUsers(
             users.map((u) => (u.email === editingUser.email ? data.success : u))

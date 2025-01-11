@@ -36,7 +36,7 @@ const Notification = ({ message, type ,setNotify}) => {
   return (
     <div
       id="toast-default"
-      className="flex items-center w-full max-w-lg p-4 lg:ml-52  mb-2 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
+      className="flex items-center w-full max-w-lg p-4   mb-2 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
       role="alert"
     >
       <div

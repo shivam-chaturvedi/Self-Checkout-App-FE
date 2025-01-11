@@ -37,7 +37,7 @@ const LoginPage = ({ setIsAdmin, setUser, setIsLoggedIn }) => {
       });
 
       const data = await res.json(); // Make sure to await the JSON response
-      console.log(data);
+      // console.log(data);
       if (res.ok) {
         setLoader(false);
         localStorage.setItem("jwt_token", data.success);

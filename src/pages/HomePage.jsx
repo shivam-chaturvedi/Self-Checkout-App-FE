@@ -6,7 +6,7 @@ const HomePage = () => {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       {/* for whatsapp logo chat */}
-      <div class="elfsight-app-e6453eb0-ef8c-476b-ae42-6a096d19011b" data-elfsight-app-lazy></div>
+      <div className="elfsight-app-e6453eb0-ef8c-476b-ae42-6a096d19011b" data-elfsight-app-lazy></div>
       <section
         className="relative py-16 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/banner.jpg')" }}

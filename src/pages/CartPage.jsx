@@ -61,7 +61,6 @@ const CartPage = ({ user }) => {
 
       if (res.ok) {
         setCartAttached(data.userCart.id);
-        localStorage.setItem("CurrentCartId", data.userCart.id);
         setNotify("Cart successfully attached!");
       } else {
         setNotify(data.error);
@@ -165,18 +164,78 @@ const CartPage = ({ user }) => {
     }
   };
 
-  useEffect(() => {
-    if(localStorage.getItem("CurrentCartId")){
-      setIsScanningCart(false);
-      setCartAttached(localStorage.getItem("CurrentCartId"));
+  const fetchActiveCart = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${BACKEND_SERVER_URL}/user/get-active-cart/${user.email}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          },
+        }
+      );
+      const data = await res.json();
+      // console.log(data);
+      if (res.ok) {
+        setIsScanningCart(false);
+        setCartAttached(data.userCart.id);
+        await fetchCartItems();
+      }
+    } catch (error) {
+      console.error(error);
+      setNotify("Error fetching active cart.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const detachCart = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${BACKEND_SERVER_URL}/user-cart/detach/${attachedCart}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          },
+        }
+      );
+      const data = await res.json();
+
+      if (res.ok) {
+        setCartAttached(null);
+        window.location.reload();
+        setNotify("Cart successfully Detached!");
+      } else {
+        setNotify(data.error.slice(0, 25));
+      }
+    } catch (err) {
+      setError(err.message);
+      setNotify("Failed to Detach cart. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      await fetchActiveCart();
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     if (!selectedDeviceId || (!isScanningCart && !isScanningProducts)) return;
 
     const codeReader = new BrowserBarcodeReader();
     let mounted = true;
 
     const startScanner = async () => {
-      await fetchCartItems();
       try {
         await codeReader.decodeFromVideoDevice(
           selectedDeviceId,
@@ -218,7 +277,7 @@ const CartPage = ({ user }) => {
                 }
               }
             } else if (err && err.name !== "NotFoundException") {
-              setNotify("Error scanning code. Please try again.");
+              // setNotify("Error scanning code. Please try again.");
             }
           }
         );
@@ -247,6 +306,20 @@ const CartPage = ({ user }) => {
             <h1 className="text-3xl font-bold text-gray-800">
               {!attachedCart ? "Cart Scanner" : `Cart #${attachedCart}`}
             </h1>
+            {attachedCart && (
+              <button
+                className="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded"
+                onClick={() => {
+                  // eslint-disable-next-line no-restricted-globals
+                  if(confirm("Do you want to detach Cart (All Current Cart Item Will Get Lost) !")){
+                    detachCart();
+                  }
+                  return;
+                }}
+              >
+                Detach Cart
+              </button>
+            )}
           </div>
 
           {/* Main Content */}
@@ -303,7 +376,9 @@ const CartPage = ({ user }) => {
             {/* Scanned Items Table */}
             {attachedCart && scannedItems.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4">Scanned Items</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Current Cart Items
+                </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full table-auto">
                     <thead className="bg-gray-50">
