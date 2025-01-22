@@ -20,7 +20,7 @@ const Navbar = ({ exclude = [] ,isLoggedIn,isAdmin}) => {
 
 
     return (
-        <nav className="bg-[#254E58] p-3">
+        <nav className="bg-[#254E58] p-3 ">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo and App Name */}
                 <Link className="flex items-center space-x-2" to="/">

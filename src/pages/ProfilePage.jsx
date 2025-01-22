@@ -8,7 +8,20 @@ export default function UserProfile({ user }) {
   const handleViewMore = () => {
     setVisibleTransactions((prev) => prev + 5);
   };
-
+  
+  function formatDateTime(dateTimeString) {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+  
+    const date = new Date(dateTimeString);
+    return date.toLocaleString("en-US", options);
+  }
   
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -22,7 +35,7 @@ export default function UserProfile({ user }) {
             {user && user.email}
           </h1>
           <p className="text-xl text-gray-500">
-            Member since: {user && user.createdAt}
+            Member since: {user && formatDateTime(user.createdAt)}
           </p>
           <p className="text-xl text-gray-500">
             Member role: {user && user.role}
@@ -83,7 +96,7 @@ export default function UserProfile({ user }) {
                               {transaction.id}
                             </td>
                             <td className="border px-4 py-2">
-                              {transaction.createdAt}
+                              {formatDateTime(transaction.createdAt)}
                             </td>
                             <td className="border px-4 py-2">
                               {transaction.receipt}
@@ -136,10 +149,10 @@ export default function UserProfile({ user }) {
                   <strong>Role:</strong> {user.role}
                 </li>
                 <li>
-                  <strong>Member Since:</strong> {user.createdAt}
+                  <strong>Member Since:</strong> {formatDateTime(user.createdAt)}
                 </li>
                 <li>
-                  <strong>Last Updated:</strong> {user.updatedAt}
+                  <strong>Last Updated:</strong> {formatDateTime(user.updatedAt)}
                 </li>
               </ul>
             </div>

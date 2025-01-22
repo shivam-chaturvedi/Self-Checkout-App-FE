@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2} from "lucide-react";
+import Sidebar from "../components/Sidebar";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
@@ -12,6 +13,7 @@ export default function AdminPage() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isStoreCartOpen, setIsStoreCartOpen] = useState(false);
+  const [activeProp,setActiveProp]=useState('users');
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [editingStoreCart, setEditingStoreCart] = useState(null);
@@ -82,7 +84,6 @@ export default function AdminPage() {
       .then((res) => res.json())
       .then((data) => {
         setLoader(false);
-        console.log(data);
         setStoreCarts(data);
       })
       .catch((err) => {
@@ -298,15 +299,37 @@ export default function AdminPage() {
     setIsStoreCartOpen(true);
   };
 
+  function formatDateTime(dateTimeString) {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+  
+    const date = new Date(dateTimeString);
+    return date.toLocaleString("en-US", options);
+  }
+  
+   
+
   return (
     <>
       {loader && <LoaderComponent />}
+      <div className="flex m-1">
+        
+      <Sidebar active={activeProp} setActiveProp={setActiveProp}/>
+
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
+        {activeProp==='users' && (
+          <>
         {/* User Table Section */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Users</h2>
+        <div className="flex justify-between items-center mb-4 ">
+          <h2 className="text-xl font-semibold ml-8">Users</h2>
           <button
             onClick={handleAddUser}
             className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
@@ -317,7 +340,7 @@ export default function AdminPage() {
         </div>
 
         {/* Scrollable User Table */}
-        <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
+        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
           {users.length > 0 ? (
             <table className="min-w-full table-auto text-white font-bold">
               {/* Table Header */}
@@ -353,8 +376,8 @@ export default function AdminPage() {
                       index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
                     } hover:bg-[#1B3438] font-mono font-light`}
                   >
-                    <td className="py-3 px-4 ">{user.createdAt}</td>
-                    <td className="py-3 px-4 ">{user.updatedAt}</td>
+                    <td className="py-3 px-4 ">{formatDateTime(user.createdAt)}</td>
+                    <td className="py-3 px-4 ">{formatDateTime(user.updatedAt)}</td>
                     <td className="py-3 px-4 ">{user.email}</td>
                     <td className="py-3 px-4 ">
                       {user.password.slice(6, 20)}...
@@ -384,10 +407,15 @@ export default function AdminPage() {
             </h1>
           )}
         </div>
+        </>
+        )}
 
+        {activeProp==='products' && (
+          <>
         {/* Product Table Section */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-[#ffffff]">Products</h2>
+          <h2 className="text-xl font-semibold ml-8">Products</h2>
+          
           <button
             onClick={handleAddProduct}
             className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
@@ -398,12 +426,18 @@ export default function AdminPage() {
         </div>
 
         {/* Scrollable Product Table */}
-        <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
+        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
           {products.length > 0 ? (
             <table className="min-w-full table-auto text-white">
               {/* Table Header */}
               <thead>
                 <tr className="border-b border-gray-600 bg-[#1D4046]">
+                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Created At
+                  </th>
+                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Updated At
+                  </th>
                   <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
                     Product Name
                   </th>
@@ -437,6 +471,9 @@ export default function AdminPage() {
                       index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
                     } hover:bg-[#1B3438] font-mono font-light`}
                   >
+                    
+                    <td className="py-3 px-4">{formatDateTime(product.createdAt) || "NA"}</td>
+                    <td className="py-3 px-4">{formatDateTime(product.updatedAt) || "NA"}</td>
                     <td className="py-3 px-4">{product.name || "NA"}</td>
                     <td className="py-3 px-4">₹{product.price || "NA"}</td>
                     <td className="py-3 px-4">{product.category || "NA"}</td>
@@ -478,26 +515,35 @@ export default function AdminPage() {
             </h1>
           )}
         </div>
+        </>
 
+        )}
+
+
+        {activeProp==='carts' && (
+          <>
         {/* StoreCart Table Section */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-[#ffffff]">Store Carts</h2>
+          <h2 className="text-xl font-semibold ml-8">Store Carts</h2>
           <button
             onClick={handleAddStoreCart}
             className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Store Cart
+            Generate New Store Cart
           </button>
         </div>
 
         {/* Scrollable Product Table */}
-        <div className="overflow-y-scroll h-[50vh] bg-[#254E58] shadow-md rounded-lg mb-4">
+        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
           {storeCarts.length > 0 ? (
             <table className="min-w-full table-auto text-white">
               {/* Table Header */}
               <thead>
                 <tr className="border-b border-gray-600 bg-[#1D4046]">
+                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
+                    Created At
+                  </th>
                   <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
                     StoreCart Id
                   </th>
@@ -527,6 +573,8 @@ export default function AdminPage() {
                       index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
                     } hover:bg-[#1B3438] font-mono font-light`}
                   >
+                    
+                    <td className="py-3 px-4">{formatDateTime(storeCart.createdAt) || "NA"}</td>
                     <td className="py-3 px-4">{storeCart.id || "NA"}</td>
                     <td className="py-3 px-4">
                       {storeCart.active ? "YES" : "NO" || "NA"}
@@ -566,6 +614,15 @@ export default function AdminPage() {
           )}
         </div>
 
+        </>
+        )}
+
+        {activeProp==='reports' && 
+        <div className="flex justify-center items-center w-full h-[70vh]">
+          <h1 className=" text-center mx-auto font-mono text-3xl text-gray-400">Feature coming soon </h1>
+          </div>
+        }
+
         {/* Modals for Add/Edit */}
         <UserModal
           isOpen={isUserModalOpen}
@@ -582,6 +639,10 @@ export default function AdminPage() {
           setNewProduct={setNewProduct}
           handleSaveProduct={handleSaveProduct}
         />
+
+      
+      </div>
+      
 
       </div>
     </>

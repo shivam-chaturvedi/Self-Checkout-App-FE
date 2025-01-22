@@ -77,7 +77,7 @@ const CartPage = ({ user }) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${BACKEND_SERVER_URL}/cart/get-all/${user.email}`,
+        `${BACKEND_SERVER_URL}/user-cart/get-all/${user.email}`,
         {
           method: "GET",
           headers: {
@@ -144,7 +144,7 @@ const CartPage = ({ user }) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `${BACKEND_SERVER_URL}/cart/remove-item/${item.id}`,
+        `${BACKEND_SERVER_URL}/user-cart/remove-item/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -226,8 +226,8 @@ const CartPage = ({ user }) => {
     async function fetchData() {
       await fetchActiveCart();
     }
-    fetchData();
-  }, []);
+      fetchData();
+  }, []);  
 
   useEffect(() => {
     if (!selectedDeviceId || (!isScanningCart && !isScanningProducts)) return;
