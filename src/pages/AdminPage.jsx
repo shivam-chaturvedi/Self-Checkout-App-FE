@@ -619,7 +619,7 @@ export default function AdminPage() {
 
         {activeProp==='reports' && 
         <div className="flex justify-center items-center w-full h-[70vh]">
-          <h1 className=" text-center mx-auto font-mono text-3xl text-gray-400">Feature coming soon </h1>
+          <h1 className=" text-center mx-auto font-mono text-3xl text-gray-400">Feature coming soon</h1>
           </div>
         }
 
