@@ -5,6 +5,7 @@ import { BACKEND_SERVER_URL } from "../utils/config";
 import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
 import LoaderComponent from "../components/LoaderComponent";
+import { Link } from "react-router-dom";
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
@@ -17,6 +18,7 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [editingStoreCart, setEditingStoreCart] = useState(null);
+  const [reportData, setReportData] = useState(null);
 
   const [loader, setLoader] = useState(true);
 
@@ -312,6 +314,13 @@ export default function AdminPage() {
     const date = new Date(dateTimeString);
     return date.toLocaleString("en-US", options);
   }
+
+  useEffect(() => {
+    fetch(`${BACKEND_SERVER_URL}/reports/get-all-sales-data?apiKey=api@ahsbdhrandomsduywhioTGSHUDYUIbsLSJ63652jbskjdudbkjdn`)
+      .then((response) => response.json())
+      .then((data) => setReportData(data["Purchased Items"] || {}))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
   
    
 
@@ -617,11 +626,54 @@ export default function AdminPage() {
         </>
         )}
 
-        {activeProp==='reports' && 
-        <div className="flex justify-center items-center w-full h-[70vh]">
-          <h1 className=" text-center mx-auto font-mono text-3xl text-gray-400">Feature coming soon </h1>
+        {activeProp === 'reports' && 
+          <div className="flex justify-center items-center w-full h-[70vh] p-4">
+          <div className="max-w-6xl mx-auto ">
+          <h1 className="text-2xl font-bold mt-10 mb-4 text-center">Sales Report </h1>
+           
+            {reportData && Object.keys(reportData).length > 0 ? (
+              <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
+                <thead>
+                  <tr className="bg-[#1D4046] text-white">
+                    <th className="border border-gray-300 p-2">Product Name</th>
+                    <th className="border border-gray-300 p-2">Category</th>
+                    <th className="border border-gray-300 p-2">Price</th>
+                    <th className="border border-gray-300 p-2">Total Sold</th>
+                    <th className="border border-gray-300 p-2">Stock Left</th>
+                    <th className="border border-gray-300 p-2">Total Revenue</th>
+                    <th className="border border-gray-300 p-2">Last Sold Quantity</th>
+                    <th className="border border-gray-300 p-2">Last Sold Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(reportData).map((key) => {
+                    const item = reportData[key];
+                    const lastSale = item.timeStampsAndQuantitySold?.[item.timeStampsAndQuantitySold.length - 1] || {};
+                    const lastSoldTime = Object.keys(lastSale)[0] || "N/A";
+                    const lastSoldQuantity = lastSale[lastSoldTime] || "N/A";
+                    
+                    return (
+                      <tr key={key} className="text-center border-t border-gray-300">
+                        <td className="border border-gray-300 p-2">{item.productName}</td>
+                        <td className="border border-gray-300 p-2">{item.category}</td>
+                        <td className="border border-gray-300 p-2">₹{item.productPrice}</td>
+                        <td className="border border-gray-300 p-2">{item.totalQuantitySold}</td>
+                        <td className="border border-gray-300 p-2">{item.quantityLeftInStock}</td>
+                        <td className="border border-gray-300 p-2">₹{item.totalSoldAmount}</td>
+                        <td className="border border-gray-300 p-2">{lastSoldQuantity}</td>
+                        <td className="border border-gray-300 p-2">{formatDateTime(lastSoldTime)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-center text-gray-500">No sales data available</p>
+            )}
           </div>
+        </div>
         }
+
 
         {/* Modals for Add/Edit */}
         <UserModal

@@ -1,4 +1,4 @@
-export const BACKEND_SERVER_URL="http://192.168.1.9:8080";
+export const BACKEND_SERVER_URL="https://donalddesk.duckdns.org:8443";
 
 
 // https://retail-edge-be-latest.onrender.com/
