@@ -6,6 +6,12 @@ import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
 import LoaderComponent from "../components/LoaderComponent";
 import { Link } from "react-router-dom";
+import MaxMinSoldChart from "../components/MaxMinSoldChart";
+import SalesByDate from "../components/SalesByDate";
+import SalesChart from "../components/SalesChart";
+import StockByCategoryChart from "../components/StockByCategoryChart";
+import SoldByCategoryChart from "../components/SoldByCategoryChart";
+import RevenueByDate from "../components/RevenueByDate";
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
@@ -330,7 +336,7 @@ export default function AdminPage() {
       <div className="flex m-1">
         
       <Sidebar active={activeProp} setActiveProp={setActiveProp}/>
-
+      
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
@@ -626,7 +632,7 @@ export default function AdminPage() {
         </>
         )}
 
-        {activeProp === 'reports' && 
+        {/* {activeProp === 'reports' && 
           <div className="flex justify-center items-center w-full h-[70vh] p-4">
           <div className="max-w-6xl mx-auto ">
           <h1 className="text-2xl font-bold mt-10 mb-4 text-center">Sales Report </h1>
@@ -672,7 +678,113 @@ export default function AdminPage() {
             )}
           </div>
         </div>
-        }
+        } */}
+        
+        {activeProp === "salesDashboard" && (
+  <div className="flex justify-center items-center w-full h-auto p-6">
+    <div className="max-w-6xl mx-auto w-full">
+      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Dashboard</h1>
+
+      {/* Grid Layout for Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Sales Trends Chart */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sales Trends</h2>
+          <SalesChart salesData={reportData} />
+        </div>
+
+        {/* Max/Min Sold Items Chart */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Best & Worst Selling Products</h2>
+          <MaxMinSoldChart salesData={reportData} />
+        </div>
+
+        {/* Sales by Date */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sales on Selected Date</h2>
+          <SalesByDate salesData={reportData} />
+        </div>
+      
+
+      {/* Items Left in Stock by Category */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Items Left in Stock by Category</h2>
+          <StockByCategoryChart salesData={reportData} />
+      </div>
+      
+
+      {/* Sold Products by Category */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sold Products by Category</h2>
+          <SoldByCategoryChart salesData={reportData} />
+      </div>
+
+      {/* Revenue on Selected Date */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Revenue on Selected Date</h2>
+          <RevenueByDate salesData={reportData} />
+      </div>
+      </div>
+      </div>
+      </div>
+        )}
+
+
+
+
+    {activeProp === "reports" && (
+  <div className="flex justify-center items-center w-full h-auto p-6">
+    <div className="max-w-6xl mx-auto w-full">
+      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Report</h1>
+
+      {/* Table of Sold Items */}
+      <div className="bg-white shadow-md p-6 rounded-lg mt-6">
+
+        {reportData && Object.keys(reportData).length > 0 ? (
+          <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-[#1D4046] text-white">
+                <th className="border border-gray-300 p-2">Product Name</th>
+                <th className="border border-gray-300 p-2">Category</th>
+                <th className="border border-gray-300 p-2">Price</th>
+                <th className="border border-gray-300 p-2">Total Sold</th>
+                <th className="border border-gray-300 p-2">Stock Left</th>
+                <th className="border border-gray-300 p-2">Total Revenue</th>
+                <th className="border border-gray-300 p-2">Last Sold Quantity</th>
+                <th className="border border-gray-300 p-2">Last Sold Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(reportData).map((key) => {
+                const item = reportData[key];
+                const lastSale = item.timeStampsAndQuantitySold?.[item.timeStampsAndQuantitySold.length - 1] || {};
+                const lastSoldTime = Object.keys(lastSale)[0] || "N/A";
+                const lastSoldQuantity = lastSale[lastSoldTime] || "N/A";
+                
+                return (
+                  <tr key={key} className="text-center border-t border-gray-300">
+                    <td className="border border-gray-300 p-2">{item.productName}</td>
+                    <td className="border border-gray-300 p-2">{item.category}</td>
+                    <td className="border border-gray-300 p-2">₹{item.productPrice}</td>
+                    <td className="border border-gray-300 p-2">{item.totalQuantitySold}</td>
+                    <td className="border border-gray-300 p-2">{item.quantityLeftInStock}</td>
+                    <td className="border border-gray-300 p-2">₹{item.totalSoldAmount}</td>
+                    <td className="border border-gray-300 p-2">{lastSoldQuantity}</td>
+                    <td className="border border-gray-300 p-2">{formatDateTime(lastSoldTime)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-center text-gray-500">No sales data available</p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
 
 
         {/* Modals for Add/Edit */}

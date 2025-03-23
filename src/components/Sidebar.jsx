@@ -118,6 +118,23 @@ const Sidebar = ({ active, setActiveProp }) => {
                 <span>Reports</span>
               </button>
             </li>
+
+
+            <li
+  onClick={() => {
+    setActiveProp("salesDashboard");
+  }}
+  className={
+    active === "salesDashboard"
+      ? "p-4 hover:bg-purple-700 bg-green-900"
+      : "p-4 hover:bg-purple-700 "
+  }
+>
+  <button className="flex items-center space-x-3">
+    <span className="text-xl">📈</span>
+    <span>Sales Dashboard</span>
+  </button>
+</li>
           </ul>
         </nav>
       </div>
