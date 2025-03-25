@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GiCctvCamera } from "react-icons/gi";
 
 const Sidebar = ({ active, setActiveProp }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
@@ -15,9 +16,9 @@ const Sidebar = ({ active, setActiveProp }) => {
 
       {/* Sidebar */}
       <div
-        className={`h-[88vh] w-72 absolute z-40 bg-black text-white flex flex-col transition-transform duration-300 ${
+        className={`h-screen top-0 fixed w-72 z-40 bg-black text-white flex flex-col transition-transform duration-300 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:relative`}
+        } md:translate-x-0 md:relative sticky`}
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-16 border-b border-purple-500">
@@ -120,6 +121,7 @@ const Sidebar = ({ active, setActiveProp }) => {
             </li>
 
 
+
             <li
   onClick={() => {
     setActiveProp("salesDashboard");
@@ -135,6 +137,21 @@ const Sidebar = ({ active, setActiveProp }) => {
     <span>Sales Dashboard</span>
   </button>
 </li>
+<li
+              onClick={() => {
+                setActiveProp("surveillance");
+              }}
+              className={
+                active === "users"
+                  ? "p-4 hover:bg-purple-700 bg-green-900 mt-5"
+                  : "p-4 hover:bg-purple-700"
+              }
+            >
+              <button className="flex items-center space-x-3">
+                <span className="text-xl "><GiCctvCamera /></span>
+                <span>Surveillance</span>
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
