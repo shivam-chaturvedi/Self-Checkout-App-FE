@@ -18,7 +18,7 @@ const Sidebar = ({ active, setActiveProp }) => {
       <div
         className={`h-screen top-0 fixed w-72 z-40 bg-black text-white flex flex-col transition-transform duration-300 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:relative sticky`}
+        } md:translate-x-0 md:relative`}
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-16 border-b border-purple-500">
