@@ -25,6 +25,7 @@ export default function AdminPage() {
   const [editingUser, setEditingUser] = useState(null);
   const [editingStoreCart, setEditingStoreCart] = useState(null);
   const [reportData, setReportData] = useState(null);
+  const [imageUrl, setImageUrl] = useState([]);
 
   const [loader, setLoader] = useState(true);
 
@@ -327,7 +328,61 @@ export default function AdminPage() {
       .then((data) => setReportData(data["Purchased Items"] || {}))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-  
+
+  const base64ToBlob = (base64, mimeType = "image/png") => {
+    const byteCharacters = atob(base64); // Decode Base64
+    const byteNumbers = new Array(byteCharacters.length)
+        .fill()
+        .map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+};
+
+
+useEffect(() => {
+  const fetchImages = async () => {
+      setLoader(true);
+
+      try {
+          const response = await fetch(`${BACKEND_SERVER_URL}/get-surveillance-images`, {
+              method: "GET",
+              headers: {
+                  Authorization: "Bearer " + localStorage.getItem("jwt_token"),
+              },
+          });
+
+          setLoader(false);
+          if (!response.ok) throw new Error("Failed to fetch images");
+
+          const data = await response.json();
+
+          if (data.success && data.success.length > 0) {
+              const formattedImages = data.success.map((item) => {
+                  const blob = base64ToBlob(item.imageData, "image/png");
+                  const imageUrl = URL.createObjectURL(blob);
+
+                  return {
+                      id: item.id,
+                      updatedAt: formatDateTime( new Date(item.updatedAt).toLocaleString()),
+                      imageUrl: imageUrl,
+                      description: item.description || "No description available",
+                  };
+              });
+
+              setImageUrl(formattedImages);
+          }
+      } catch (error) {
+          console.error("Error fetching images:", error);
+          setLoader(false);
+      }
+  };
+
+  fetchImages();
+
+  return () => {
+      imageUrl.forEach((img) => URL.revokeObjectURL(img.imageUrl));
+  };
+}, []);
    
 
   return (
@@ -632,103 +687,37 @@ export default function AdminPage() {
         </>
         )}
 
-        {/* {activeProp === 'reports' && 
-          <div className="flex justify-center items-center w-full h-[70vh] p-4">
-          <div className="max-w-6xl mx-auto ">
-          <h1 className="text-2xl font-bold mt-10 mb-4 text-center">Sales Report </h1>
-           
-            {reportData && Object.keys(reportData).length > 0 ? (
-              <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-[#1D4046] text-white">
-                    <th className="border border-gray-300 p-2">Product Name</th>
-                    <th className="border border-gray-300 p-2">Category</th>
-                    <th className="border border-gray-300 p-2">Price</th>
-                    <th className="border border-gray-300 p-2">Total Sold</th>
-                    <th className="border border-gray-300 p-2">Stock Left</th>
-                    <th className="border border-gray-300 p-2">Total Revenue</th>
-                    <th className="border border-gray-300 p-2">Last Sold Quantity</th>
-                    <th className="border border-gray-300 p-2">Last Sold Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.keys(reportData).map((key) => {
-                    const item = reportData[key];
-                    const lastSale = item.timeStampsAndQuantitySold?.[item.timeStampsAndQuantitySold.length - 1] || {};
-                    const lastSoldTime = Object.keys(lastSale)[0] || "N/A";
-                    const lastSoldQuantity = lastSale[lastSoldTime] || "N/A";
-                    
-                    return (
-                      <tr key={key} className="text-center border-t border-gray-300">
-                        <td className="border border-gray-300 p-2">{item.productName}</td>
-                        <td className="border border-gray-300 p-2">{item.category}</td>
-                        <td className="border border-gray-300 p-2">₹{item.productPrice}</td>
-                        <td className="border border-gray-300 p-2">{item.totalQuantitySold}</td>
-                        <td className="border border-gray-300 p-2">{item.quantityLeftInStock}</td>
-                        <td className="border border-gray-300 p-2">₹{item.totalSoldAmount}</td>
-                        <td className="border border-gray-300 p-2">{lastSoldQuantity}</td>
-                        <td className="border border-gray-300 p-2">{formatDateTime(lastSoldTime)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-center text-gray-500">No sales data available</p>
-            )}
-          </div>
-        </div>
-        } */}
+        {activeProp === 'surveillance' && 
+         <div className="p-4">
+         <h2 className="text-lg font-bold mb-4">Surveillance Images</h2>
+         
+         {/* Scrollable Container */}
+         <div className="h-[400px] overflow-y-auto border p-4 rounded-lg shadow-md">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+             {imageUrl.map((img) => (
+               <div key={img.id} className="border p-4 rounded-lg shadow-md w-full max-w-xs mx-auto">
+                 <div className="flex justify-center">
+                   <img
+                     src={img.imageUrl}
+                     alt={`Camera ${img.id}`}
+                     className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-md"
+                   />
+                 </div>
+                 <p className="mt-2 text-sm sm:text-base text-gray-600">
+                   <span className="font-bold text-purple-600">🆔 Camera ID:</span> {img.id}
+                 </p>
+                 <p className="text-xs sm:text-sm text-gray-500">📅 Date & Time: {img.updatedAt}</p>
+                 <p className="text-red-600 font-bold mt-2">⚠ Security Threat Detected:</p>
+                 <p className="text-red-500">{img.description}</p>
+               </div>
+             ))}
+           </div>
+         </div>
+       </div>
+       
+        }
         
-        {activeProp === "salesDashboard" && (
-  <div className="flex justify-center items-center w-full h-auto p-6">
-    <div className="max-w-6xl mx-auto w-full">
-      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Dashboard</h1>
-
-      {/* Grid Layout for Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Sales Trends Chart */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sales Trends</h2>
-          <SalesChart salesData={reportData} />
-        </div>
-
-        {/* Max/Min Sold Items Chart */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Best & Worst Selling Products</h2>
-          <MaxMinSoldChart salesData={reportData} />
-        </div>
-
-        {/* Sales by Date */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sales on Selected Date</h2>
-          <SalesByDate salesData={reportData} />
-        </div>
-      
-
-      {/* Items Left in Stock by Category */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Items Left in Stock by Category</h2>
-          <StockByCategoryChart salesData={reportData} />
-      </div>
-      
-
-      {/* Sold Products by Category */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sold Products by Category</h2>
-          <SoldByCategoryChart salesData={reportData} />
-      </div>
-
-      {/* Revenue on Selected Date */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Revenue on Selected Date</h2>
-          <RevenueByDate salesData={reportData} />
-      </div>
-      </div>
-      </div>
-      </div>
-        )}
 
 
 
@@ -784,6 +773,56 @@ export default function AdminPage() {
     </div>
   </div>
 )}
+
+ {activeProp === "salesDashboard" && (
+  <div className="flex justify-center items-center w-full h-auto p-6">
+    <div className="max-w-6xl mx-auto w-full">
+      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Dashboard</h1>
+
+      {/* Grid Layout for Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Sales Trends Chart */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sales Trends</h2>
+          <SalesChart salesData={reportData} />
+        </div>
+
+        {/* Max/Min Sold Items Chart */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Best & Worst Selling Products</h2>
+          <MaxMinSoldChart salesData={reportData} />
+        </div>
+
+        {/* Sales by Date */}
+        <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sales on Selected Date</h2>
+          <SalesByDate salesData={reportData} />
+        </div>
+      
+
+      {/* Items Left in Stock by Category */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Items Left in Stock by Category</h2>
+          <StockByCategoryChart salesData={reportData} />
+      </div>
+      
+
+      {/* Sold Products by Category */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Sold Products by Category</h2>
+          <SoldByCategoryChart salesData={reportData} />
+      </div>
+
+      {/* Revenue on Selected Date */}
+      <div className="bg-white shadow-md p-4 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Revenue on Selected Date</h2>
+          <RevenueByDate salesData={reportData} />
+      </div>
+      </div>
+      </div>
+      </div>
+        )}
 
 
 
