@@ -142,7 +142,7 @@ const Sidebar = ({ active, setActiveProp }) => {
                 setActiveProp("surveillance");
               }}
               className={
-                active === "users"
+                active === "surveillance"
                   ? "p-4 hover:bg-purple-700 bg-green-900 mt-5"
                   : "p-4 hover:bg-purple-700"
               }
