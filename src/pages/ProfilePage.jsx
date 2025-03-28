@@ -1,6 +1,7 @@
 "use client";
 import { Settings, User, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { BACKEND_SERVER_URL } from "../utils/config";
 
 export default function UserProfile({ user }) {
   const [activeTab, setActiveTab] = useState("Transactions"); // Active tab state
@@ -26,12 +27,13 @@ export default function UserProfile({ user }) {
 
   const initReq = async (transactionId) => {
     try {
-      const response = await fetch(`/init-refund/${transactionId}`, {
+      const response = await fetch(`${BACKEND_SERVER_URL}/api/init-refund/${transactionId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
-      });
+          Authorization: "Bearer " + localStorage.getItem("jwt_token")
+        
+    }});
   
       const data = await response.json();
   
@@ -141,7 +143,7 @@ export default function UserProfile({ user }) {
                               {transaction.status}
                             </td>
                             <td className="border px-4 py-2">
-                              <button className="bg-green-300" onClick={()=>{initReq(transaction.id)}}>Request Refund</button>
+                              <button className="bg-green-300 p-2 rounded-2" onClick={()=>{initReq(transaction.id)}}>Request Refund</button>
                             </td>
                           </tr>
                         ))}

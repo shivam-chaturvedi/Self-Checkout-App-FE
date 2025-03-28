@@ -152,6 +152,21 @@ const Sidebar = ({ active, setActiveProp }) => {
                 <span>Surveillance</span>
               </button>
             </li>
+            <li
+              onClick={() => {
+                setActiveProp("Refund");
+              }}
+              className={
+                active === "Refund"
+                  ? "p-4 hover:bg-purple-700 bg-green-900"
+                  : "p-4 hover:bg-purple-700 mt-5"
+              }
+            >
+              <button className="flex items-center space-x-3">
+                <span className="text-xl ">👥</span>
+                <span>Track Refunds</span>
+              </button>
+            </li>
           </ul>
         </nav>
       </div>

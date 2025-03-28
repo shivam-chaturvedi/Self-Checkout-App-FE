@@ -15,6 +15,7 @@ import RevenueByDate from "../components/RevenueByDate";
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
+  const [refunds, setRefunds] = useState([]);
   const [users, setUsers] = useState([]);
   const [storeCarts, setStoreCarts] = useState([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -383,7 +384,81 @@ useEffect(() => {
       imageUrl.forEach((img) => URL.revokeObjectURL(img.imageUrl));
   };
 }, []);
+
+const fetchRefunds = async () => {
+  setLoader(true);
+  try {
+    const response = await fetch(`${BACKEND_SERVER_URL}/api/get-initiated-refunds`, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt_token"),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    setRefunds(data.success); // Extract success array from response
+  } catch (err) {
+    setLoader(err.message);
+    console.error("Error fetching refunds:", err);
+  } finally {
+    setLoader(false);
+  }
+};
+
+useEffect(() => {
+  fetchRefunds();
+}, []);
    
+
+const reject = async (id) => {
+  try {
+    const response = await fetch(`${BACKEND_SERVER_URL}/api/reject-refund/${id}`, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("jwt_token"),
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      alert("Refund rejected successfully!");
+      setRefunds(refunds.filter((refund) => refund.id !== id));
+    } else {
+      alert("Failed to reject refund.");
+    }
+  } catch (err) {
+    console.error("Error rejecting refund:", err);
+    alert("Error rejecting refund.");
+  }
+};
+
+
+const approve = async (id) => {
+  try {
+    const response = await fetch(`${BACKEND_SERVER_URL}/api/approve-refund/${id}`, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("jwt_token"),
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      alert("Refund approved successfully!");
+      setRefunds(refunds.filter((refund) => refund.id !== id)); // Remove approved refund
+    } else {
+      alert("Failed to approve refund.");
+    }
+  } catch (err) {
+    console.error("Error approving refund:", err);
+    alert("Error approving refund.");
+  }
+};
+
 
   return (
     <>
@@ -823,6 +898,50 @@ useEffect(() => {
       </div>
       </div>
         )}
+      {activeProp === "Refund" && (
+        <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Initiated Refunds</h2>
+
+  
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 px-4 py-2">ID</th>
+                <th className="border border-gray-300 px-4 py-2">Amount (INR)</th>
+                <th className="border border-gray-300 px-4 py-2">Receipt</th>
+                <th className="border border-gray-300 px-4 py-2">Status</th>
+                <th className="border border-gray-300 px-4 py-2">Refund Status</th>
+                <th className="border border-gray-300 px-4 py-2">Created At</th>
+                <th className="border border-gray-300 px-4 py-2">Updated At</th>
+                
+                <th className="border border-gray-300 px-4 py-2">Approve</th>
+                <th className="border border-gray-300 px-4 py-2">Reject</th>
+              </tr>
+            </thead>
+            <tbody>
+              {refunds.map((refund) => (
+                <tr key={refund.id} className="text-center">
+                  <td className="border border-gray-300 px-4 py-2">{refund.id}</td>
+                  <td className="border border-gray-300 px-4 py-2">{refund.amount}</td>
+                  <td className="border border-gray-300 px-4 py-2">{refund.receipt}</td>
+                  <td className="border border-gray-300 px-4 py-2">{refund.status}</td>
+                  <td className="border border-gray-300 px-4 py-2">{refund.refundStatus}</td>
+                  <td className="border border-gray-300 px-4 py-2">{new Date(refund.createdAt).toLocaleString()}</td>
+                  <td className="border border-gray-300 px-4 py-2">{new Date(refund.updatedAt).toLocaleString()}</td>
+                  
+                  <td className="border border-gray-300 px-4 py-2"><button onClick={()=>{approve(refund.id)}}>Approve Refund</button></td>
+                  <td className="border border-gray-300 px-4 py-2 text-white bg-red-500"><button onClick={()=>{reject(refund.id)}}>Reject Refund</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      )}
+
+
+      
 
 
 
