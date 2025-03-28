@@ -22,6 +22,31 @@ export default function UserProfile({ user }) {
     const date = new Date(dateTimeString);
     return date.toLocaleString("en-US", options);
   }
+
+
+  const initReq = async (transactionId) => {
+    try {
+      const response = await fetch(`/init-refund/${transactionId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert("Refund request initiated successfully!");
+      } else {
+        alert(`Error: ${data.error || "Failed to initiate refund"}`);
+      }
+    } catch (error) {
+      alert("Network error. Please try again.");
+      console.error("Refund request error:", error);
+    }
+  };
+  
+  
   
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -81,6 +106,8 @@ export default function UserProfile({ user }) {
                       <th className="px-4 py-2">Receipt</th>
                       <th className="px-4 py-2">Amount</th>
                       <th className="px-4 py-2">Status</th>
+                      
+                      <th className="px-4 py-2">Request Refund</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -112,6 +139,9 @@ export default function UserProfile({ user }) {
                               }`}
                             >
                               {transaction.status}
+                            </td>
+                            <td className="border px-4 py-2">
+                              <button className="bg-green-300" onClick={()=>{initReq(transaction.id)}}>Request Refund</button>
                             </td>
                           </tr>
                         ))}
