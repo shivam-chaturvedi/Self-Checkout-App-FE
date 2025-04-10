@@ -4,6 +4,15 @@ import { Link } from "react-router-dom";
 const HomePage = () => {
   const [bgColor, setBgColor] = useState("white"); // Default background
 
+  const colors = [
+    { name: "White", value: "white" },
+    { name: "Black", value: "black" },
+    { name: "Orange", value: "orange" },
+    { name: "Blue", value: "blue" },
+    { name: "Green", value: "green" },
+    { name: "Purple", value: "purple" },
+  ];
+
   // Function to change background color dynamically
   const changeBackground = (event) => {
     const computedStyle = window.getComputedStyle(event.target);
@@ -21,24 +30,39 @@ const HomePage = () => {
       {/* Hero Section */}
       {/* for whatsapp logo chat */}
       <div className="elfsight-app-e6453eb0-ef8c-476b-ae42-6a096d19011b" data-elfsight-app-lazy></div>
+      <div className="p-4 bg-gray-200 flex justify-center">
+        <label className="mr-2 text-lg font-semibold">Choose Background:</label>
+        <select
+          className="p-2 border border-gray-400 rounded-lg"
+          onChange={(e) => setBgColor(e.target.value)}
+          value={bgColor}
+        >
+          {colors.map((color) => (
+            <option key={color.value} value={color.value}>
+              {color.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <section
         className="relative py-16 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/banner.jpg')" }}
       >
+        
         {/* Semi-transparent overlay */}
         <div className="absolute inset-0 bg-[#ffffff] bg-opacity-75"></div>
 
         <div className="relative container mx-auto px-6 text-center text-[#141715]">
-          <h1 className="text-5xl font-extrabold leading-tight" onClick={changeBackground}>
-            Welcome to <span className="text-[#de6c2a]" onClick={changeBackground}>RetailEdge</span>
+          <h1 className="text-5xl font-extrabold leading-tight" >
+            Welcome to <span className="text-[#de6c2a]" >RetailEdge</span>
           </h1>
-          <p className="mt-6 text-xl text-blue" onClick={changeBackground}>
+          <p className="mt-6 text-xl text-blue" >
             Revolutionize your shopping experience with our self-checkout app.
           </p>
           <Link
             to="/cart"
             className="mt-8 inline-block bg-[#de6c2a] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#c0581f] transition shadow-lg"
-            onClick={changeBackground}
+            
           >
             Start Shopping
           </Link>
@@ -48,7 +72,7 @@ const HomePage = () => {
       {/* Features Section */}
       <section className="py-16 bg-gray-50 " style={{ backgroundColor: bgColor }}>
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 text-red-400" onClick={changeBackground}>
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 text-red-400" >
             Features
           </h2>
           <div className="flex flex-wrap justify-center gap-8">
@@ -59,10 +83,10 @@ const HomePage = () => {
                 alt="QR Scan"
                 className="w-16 mx-auto mb-4"
               />
-              <h4 className="text-lg font-semibold text-[#de6c2a]" onClick={changeBackground}>
+              <h4 className="text-lg font-semibold text-[#de6c2a]" >
                 Quick QR Scanning
               </h4>
-              <p className="text-gray-600 mt-2" onClick={changeBackground}>
+              <p className="text-gray-600 mt-2" >
                 Easily scan products with your device's camera to add them to
                 your cart.
               </p>
@@ -74,10 +98,10 @@ const HomePage = () => {
                 alt="Self Checkout"
                 className="w-16 mx-auto mb-4"
               />
-              <h4 className="text-lg font-semibold text-[#de6c2a]" onClick={changeBackground}>
+              <h4 className="text-lg font-semibold text-[#de6c2a]" >
                 Self Checkout
               </h4>
-              <p className="text-gray-600 mt-2" onClick={changeBackground}>
+              <p className="text-gray-600 mt-2" >
                 Enjoy the convenience of checking out your items without waiting
                 in line.
               </p>
@@ -89,10 +113,10 @@ const HomePage = () => {
                 alt="Secure Payment"
                 className="w-16 mx-auto mb-4"
               />
-              <h4 className="text-lg font-semibold text-[#de6c2a]" onClick={changeBackground}>
+              <h4 className="text-lg font-semibold text-[#de6c2a]" >
                 Secure Payments
               </h4>
-              <p className="text-gray-600 mt-2" onClick={changeBackground}>
+              <p className="text-gray-600 mt-2" >
                 Process your payments securely and efficiently right within the
                 app.
               </p>
@@ -104,22 +128,22 @@ const HomePage = () => {
       {/* Testimonials Section */}
       <section className="py-16 bg-[#C6E7FF] " style={{ backgroundColor: bgColor }}>
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-yellow-500 mb-8" onClick={changeBackground}>
+          <h2 className="text-3xl font-bold text-center text-yellow-500 mb-8" >
             What Our Users Say
           </h2>
           <div className="flex flex-wrap justify-center gap-8">
             <div className="bg-white rounded-lg shadow p-6 w-full md:w-1/3 text-center">
-              <p className="text-gray-600 italic" onClick={changeBackground}>
+              <p className="text-gray-600 italic" >
                 "RetailEdge has made my shopping experience so much faster and
                 easier. I love it!"
               </p>
-              <h4 className="mt-4 font-bold text-gray-800" onClick={changeBackground}>- Priya Sharma</h4>
+              <h4 className="mt-4 font-bold text-gray-800" >- Priya Sharma</h4>
             </div>
             <div className="bg-white rounded-lg shadow p-6 w-full md:w-1/3 text-center">
-              <p className="text-gray-600 italic" onClick={changeBackground}>
+              <p className="text-gray-600 italic" >
                 "No more long queues! This app is a game-changer."
               </p>
-              <h4 className="mt-4 font-bold text-gray-800" onClick={changeBackground}>- Aman Gupta</h4>
+              <h4 className="mt-4 font-bold text-gray-800" >- Aman Gupta</h4>
             </div>
           </div>
         </div>
@@ -127,24 +151,24 @@ const HomePage = () => {
       {/* FAQ Section */}
       <section className="py-16 bg-gray-50" style={{ backgroundColor: bgColor }}>
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-green-700 mb-8" onClick={changeBackground}>
+          <h2 className="text-3xl font-bold text-center text-green-700 mb-8" >
             Frequently Asked Questions
           </h2>
           <div className="max-w-4xl mx-auto">
             <details className="mb-4 border-b pb-2">
-              <summary className="text-lg font-semibold cursor-pointer" onClick={changeBackground}>
+              <summary className="text-lg font-semibold cursor-pointer" >
                 Is RetailEdge compatible with all devices?
               </summary>
-              <p className="mt-2 text-gray-600" onClick={changeBackground}>
+              <p className="mt-2 text-gray-600" >
                 Yes, RetailEdge works seamlessly on both Android and iOS
                 devices.
               </p>
             </details>
             <details className="mb-4 border-b pb-2">
-              <summary className="text-lg font-semibold cursor-pointer" onClick={changeBackground}>
+              <summary className="text-lg font-semibold cursor-pointer" >
                 How secure are my payments?
               </summary>
-              <p className="mt-2 text-gray-600" onClick={changeBackground}>
+              <p className="mt-2 text-gray-600" >
                 We use industry-standard encryption to ensure all transactions
                 are safe and secure.
               </p>
@@ -156,17 +180,17 @@ const HomePage = () => {
       {/* Call to Action Section */}
       <section className="py-16 bg-[#FFF2D7]" style={{ backgroundColor: bgColor }}>
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-cyan-300 mb-4" onClick={changeBackground}>
+          <h2 className="text-4xl font-bold text-cyan-300 mb-4" >
             Ready to Shop Smarter?
           </h2>
-          <p className="text-gray-700 text-lg mb-6" onClick={changeBackground}>
+          <p className="text-gray-700 text-lg mb-6" >
             Download RetailEdge today and enjoy a hassle-free shopping
             experience.
           </p>
           <Link
             to="/download"
             className="bg-green-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-green-600 transition shadow-md"
-            onClick={changeBackground}
+            
           >
             Download the App
           </Link>
@@ -178,14 +202,14 @@ const HomePage = () => {
         <div className="container mx-auto px-6 text-center">
           <p className="mb-2">&copy; 2024 RetailEdge. All Rights Reserved.</p>
           <div className="flex justify-center space-x-4">
-            <Link to="/terms" className="hover:underline text-[#de6c2a]" onClick={changeBackground}>
+            <Link to="/terms" className="hover:underline text-[#de6c2a]" >
               Terms of Service
             </Link>
-            <Link to="/privacy" className="hover:underline text-[#de6c2a]" onClick={changeBackground}>
+            <Link to="/privacy" className="hover:underline text-[#de6c2a]" >
               Privacy Policy
             </Link>
 
-            <Link to="/contact" className="hover:underline text-[#de6c2a]" onClick={changeBackground}>
+            <Link to="/contact" className="hover:underline text-[#de6c2a]" >
               Contact Us
             </Link>
           </div>

@@ -74,7 +74,7 @@ const CartPage = ({ user }) => {
   };
 
   const fetchCartItems = async () => {
-    setLoading(true);
+    setLoading(false);
     try {
       const res = await fetch(
         `${BACKEND_SERVER_URL}/user-cart/get-all/${user.email}`,
@@ -227,7 +227,12 @@ const CartPage = ({ user }) => {
       await fetchActiveCart();
     }
       fetchData();
+      
+  setInterval(() => {
+    fetchCartItems();
+  }, 800);
   }, []);  
+
 
   useEffect(() => {
     if (!selectedDeviceId || (!isScanningCart && !isScanningProducts)) return;

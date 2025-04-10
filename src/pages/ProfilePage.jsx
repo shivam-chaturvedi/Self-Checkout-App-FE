@@ -12,18 +12,22 @@ export default function UserProfile({ user }) {
   
   function formatDateTime(dateTimeString) {
     const options = {
+      timeZone: "Asia/Kolkata",
+      timeZoneName: "short", 
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
+      second: "2-digit"
     };
   
-    const date = new Date(dateTimeString);
+    const utcDateTimeString = dateTimeString.endsWith('Z') ? dateTimeString : dateTimeString + 'Z';
+    const date = new Date(utcDateTimeString);
+  
     return date.toLocaleString("en-US", options);
   }
-
+  
 
   const initReq = async (transactionId) => {
     try {
@@ -125,7 +129,7 @@ export default function UserProfile({ user }) {
                               {transaction.id}
                             </td>
                             <td className="border px-4 py-2">
-                              {formatDateTime(transaction.createdAt)}
+                              {formatDateTime(transaction.updatedAt)}
                             </td>
                             <td className="border px-4 py-2">
                               {transaction.receipt}

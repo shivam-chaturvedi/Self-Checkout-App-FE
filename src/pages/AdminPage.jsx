@@ -49,7 +49,6 @@ export default function AdminPage() {
     currentUser: "", //current attached user to that cart
   });
 
-  // Fetch products and users from the backend
   useEffect(() => {
     setLoader(true);
     fetch(`${BACKEND_SERVER_URL}/admin/product/get-all`, {
@@ -68,7 +67,7 @@ export default function AdminPage() {
         setLoader(false);
       });
 
-    // Fetch users
+    // user api it is
     fetch(`${BACKEND_SERVER_URL}/admin/get-all-users`, {
       method: "GET",
       headers: {
@@ -109,6 +108,7 @@ export default function AdminPage() {
     const url = editingProduct
       ? `${BACKEND_SERVER_URL}/admin/update/product`
       : `${BACKEND_SERVER_URL}/admin/add/product`;
+
 
     fetch(url, {
       method: method,
@@ -767,7 +767,7 @@ const approve = async (id) => {
          <h2 className="text-lg font-bold mb-4">Surveillance Images</h2>
          
          {/* Scrollable Container */}
-         <div className="h-[400px] overflow-y-auto border p-4 rounded-lg shadow-md">
+         <div className="h-[520px] overflow-y-auto border p-4 rounded-lg shadow-md">
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
              {imageUrl.map((img) => (
                <div key={img.id} className="border p-4 rounded-lg shadow-md w-full max-w-xs mx-auto">
@@ -775,6 +775,7 @@ const approve = async (id) => {
                    <img
                      src={img.imageUrl}
                      alt={`Camera ${img.id}`}
+                     loading='lazy'
                      className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-md"
                    />
                  </div>
