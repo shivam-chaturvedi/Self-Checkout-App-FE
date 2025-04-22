@@ -1,49 +1,18 @@
-import React , {useState} from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 const HomePage = () => {
-  const [bgColor, setBgColor] = useState("white"); // Default background
 
-  const colors = [
-    { name: "White", value: "white" },
-    { name: "Black", value: "black" },
-    { name: "Orange", value: "orange" },
-    { name: "Blue", value: "blue" },
-    { name: "Green", value: "green" },
-    { name: "Purple", value: "purple" },
-  ];
-
-  // Function to change background color dynamically
-  const changeBackground = (event) => {
-    const computedStyle = window.getComputedStyle(event.target);
-    let selectedColor = computedStyle.color; // Default to text color
-
-    // If clicked on a button, use background color instead
-    if (computedStyle.backgroundColor !== "rgba(0, 0, 0, 0)") {
-      selectedColor = computedStyle.backgroundColor;
-    }
-
-    setBgColor(selectedColor); // Update background
-  };
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       {/* for whatsapp logo chat */}
-      <div className="elfsight-app-e6453eb0-ef8c-476b-ae42-6a096d19011b" data-elfsight-app-lazy></div>
-      <div className="p-4 bg-gray-200 flex justify-center">
-        <label className="mr-2 text-lg font-semibold">Choose Background:</label>
-        <select
-          className="p-2 border border-gray-400 rounded-lg"
-          onChange={(e) => setBgColor(e.target.value)}
-          value={bgColor}
-        >
-          {colors.map((color) => (
-            <option key={color.value} value={color.value}>
-              {color.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* <div className="elfsight-app-e6453eb0-ef8c-476b-ae42-6a096d19011b" data-elfsight-app-lazy></div>
+       */}
+      {/* for ai chat */}
+      
+<div class="elfsight-app-9bbf23d1-4ecb-430d-9560-7fa3da5f4c84" data-elfsight-app-lazy></div>
+
       <section
         className="relative py-16 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/banner.jpg')" }}
@@ -70,7 +39,7 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50 " style={{ backgroundColor: bgColor }}>
+      <section className="py-16 bg-gray-50 " >
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 text-red-400" >
             Features
@@ -126,7 +95,7 @@ const HomePage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-[#C6E7FF] " style={{ backgroundColor: bgColor }}>
+      <section className="py-16 bg-[#C6E7FF] " >
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-yellow-500 mb-8" >
             What Our Users Say
@@ -149,7 +118,7 @@ const HomePage = () => {
         </div>
       </section>
       {/* FAQ Section */}
-      <section className="py-16 bg-gray-50" style={{ backgroundColor: bgColor }}>
+      <section className="py-16 bg-gray-50" >
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center text-green-700 mb-8" >
             Frequently Asked Questions
@@ -178,7 +147,7 @@ const HomePage = () => {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-16 bg-[#FFF2D7]" style={{ backgroundColor: bgColor }}>
+      <section className="py-16 bg-[#FFF2D7]" >
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-cyan-300 mb-4" >
             Ready to Shop Smarter?

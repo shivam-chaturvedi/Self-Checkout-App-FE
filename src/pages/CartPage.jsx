@@ -230,7 +230,7 @@ const CartPage = ({ user }) => {
       
   setInterval(() => {
     fetchCartItems();
-  }, 800);
+  }, 2000);
   }, []);  
 
 
