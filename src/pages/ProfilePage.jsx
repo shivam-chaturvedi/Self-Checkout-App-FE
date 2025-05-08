@@ -1,6 +1,7 @@
 "use client";
 import { Settings, User, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { BACKEND_SERVER_URL } from "../utils/config";
 
 export default function UserProfile({ user }) {
   const [activeTab, setActiveTab] = useState("Transactions"); // Active tab state
@@ -8,9 +9,11 @@ export default function UserProfile({ user }) {
   const handleViewMore = () => {
     setVisibleTransactions((prev) => prev + 5);
   };
-  
+
   function formatDateTime(dateTimeString) {
     const options = {
+      timeZone: "Asia/Kolkata",
+      timeZoneName: "short",
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -18,11 +21,41 @@ export default function UserProfile({ user }) {
       minute: "2-digit",
       second: "2-digit",
     };
-  
-    const date = new Date(dateTimeString);
+
+    const utcDateTimeString = dateTimeString.endsWith("Z")
+      ? dateTimeString
+      : dateTimeString + "Z";
+    const date = new Date(utcDateTimeString);
+
     return date.toLocaleString("en-US", options);
   }
-  
+
+  const initReq = async (transactionId) => {
+    try {
+      const response = await fetch(
+        `${BACKEND_SERVER_URL}/api/init-refund/${transactionId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("jwt_token"),
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Refund request initiated successfully!");
+      } else {
+        alert(`Error: ${data.error || "Failed to initiate refund"}`);
+      }
+    } catch (error) {
+      alert("Network error. Please try again.");
+      console.error("Refund request error:", error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       {/* Header */}
@@ -81,10 +114,12 @@ export default function UserProfile({ user }) {
                       <th className="px-4 py-2">Receipt</th>
                       <th className="px-4 py-2">Amount</th>
                       <th className="px-4 py-2">Status</th>
+                      <th className="px-4 py-2">Request Refund</th>
+                      <th className="px-4 py-2">Download Bill</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {user!==null &&
+                    {user !== null &&
                       user.transactions
                         .slice(0, visibleTransactions)
                         .map((transaction) => (
@@ -96,7 +131,7 @@ export default function UserProfile({ user }) {
                               {transaction.id}
                             </td>
                             <td className="border px-4 py-2">
-                              {formatDateTime(transaction.createdAt)}
+                              {formatDateTime(transaction.updatedAt)}
                             </td>
                             <td className="border px-4 py-2">
                               {transaction.receipt}
@@ -112,6 +147,37 @@ export default function UserProfile({ user }) {
                               }`}
                             >
                               {transaction.status}
+                            </td>
+                            <td className="border px-4 py-2">
+                              <button
+                                className="bg-green-300 p-2 rounded-2"
+                                onClick={() => {
+                                  initReq(transaction.id);
+                                }}
+                              >
+                                Request Refund
+                              </button>
+                            </td>
+                            <td className="border px-4 py-2 text-center">
+                              {transaction.status === "Completed" ? (
+                                <a
+                                  href={`${BACKEND_SERVER_URL}/user-cart/get-bill/${transaction.id}`}
+                                  className="inline-flex flex-col items-center justify-center space-y-1 transition-transform transform hover:scale-105"
+                                >
+                                  <img
+                                    src="/images/download.png"
+                                    alt="Download"
+                                    className="w-8 h-8"
+                                  />
+                                  <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-md shadow hover:bg-green-600 transition-all duration-200">
+                                    Download Bill
+                                  </span>
+                                </a>
+                              ) : (
+                                <span className="text-gray-400 italic">
+                                  Not Available
+                                </span>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -149,10 +215,12 @@ export default function UserProfile({ user }) {
                   <strong>Role:</strong> {user.role}
                 </li>
                 <li>
-                  <strong>Member Since:</strong> {formatDateTime(user.createdAt)}
+                  <strong>Member Since:</strong>{" "}
+                  {formatDateTime(user.createdAt)}
                 </li>
                 <li>
-                  <strong>Last Updated:</strong> {formatDateTime(user.updatedAt)}
+                  <strong>Last Updated:</strong>{" "}
+                  {formatDateTime(user.updatedAt)}
                 </li>
               </ul>
             </div>

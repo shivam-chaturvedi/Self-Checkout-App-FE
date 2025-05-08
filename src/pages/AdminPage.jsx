@@ -16,6 +16,7 @@ import UserPage from "../components/UserPage";
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
   const [refunds, setRefunds] = useState([]);
+  const [refunds, setRefunds] = useState([]);
   const [users, setUsers] = useState([]);
   const [storeCarts, setStoreCarts] = useState([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -67,7 +68,7 @@ export default function AdminPage() {
         setLoader(false);
       });
 
-    // Fetch users
+    // user api it is
     fetch(`${BACKEND_SERVER_URL}/admin/get-all-users`, {
       method: "GET",
       headers: {
@@ -107,6 +108,7 @@ export default function AdminPage() {
     const url = editingProduct
       ? `${BACKEND_SERVER_URL}/admin/update/product`
       : `${BACKEND_SERVER_URL}/admin/add/product`;
+
 
     fetch(url, {
       method: method,

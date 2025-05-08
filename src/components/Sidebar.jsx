@@ -128,8 +128,8 @@ const Sidebar = ({ active, setActiveProp }) => {
   }}
   className={
     active === "salesDashboard"
-      ? "p-4 hover:bg-purple-700 bg-green-900"
-      : "p-4 hover:bg-purple-700 "
+                  ? "p-4 hover:bg-purple-700 bg-green-900"
+                  : "p-4 hover:bg-purple-700 "
   }
 >
   <button className="flex items-center space-x-3">
@@ -144,7 +144,7 @@ const Sidebar = ({ active, setActiveProp }) => {
               className={
                 active === "surveillance"
                   ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700"
+                  : "p-4 hover:bg-purple-700 "
               }
             >
               <button className="flex items-center space-x-3">
@@ -158,13 +158,13 @@ const Sidebar = ({ active, setActiveProp }) => {
               }}
               className={
                 active === "Refund"
-                  ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 mt-5"
+                  ? "p-4 px-3 hover:bg-purple-700 bg-green-900"
+                  : "p-4 px-3 hover:bg-purple-700 "
               }
             >
               <button className="flex items-center space-x-3">
                 <span className="text-xl ">👥</span>
-                <span>Refund</span>
+                <span>Track Refunds</span>
               </button>
             </li>
           </ul>
