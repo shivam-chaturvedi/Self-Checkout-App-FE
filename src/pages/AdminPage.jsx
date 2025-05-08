@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2} from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import { BACKEND_SERVER_URL } from "../utils/config";
 import UserModal from "../components/UserModal";
 import ProductModal from "../components/ProductModal";
 import LoaderComponent from "../components/LoaderComponent";
-import { Link } from "react-router-dom";
-import MaxMinSoldChart from "../components/MaxMinSoldChart";
-import SalesByDate from "../components/SalesByDate";
-import SalesChart from "../components/SalesChart";
-import StockByCategoryChart from "../components/StockByCategoryChart";
-import SoldByCategoryChart from "../components/SoldByCategoryChart";
-import RevenueByDate from "../components/RevenueByDate";
+import ReportPage from "../components/ReportPage";
+import SalesPage from "../components/SalesPage";
+import RefundPage from "../components/RefundPage";
+import SurveillancePage from "../components/SurveillancePage";
+import CartPage from "../components/CartPage";
+import ProductPage from "../components/ProductPage";
+import UserPage from "../components/UserPage";
+
 
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
+  const [refunds, setRefunds] = useState([]);
   const [users, setUsers] = useState([]);
   const [storeCarts, setStoreCarts] = useState([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -39,16 +40,15 @@ export default function AdminPage() {
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
-    role: "", // Default role
+    role: "",
   });
 
   const [newStoreCart, setNewStoreCart] = useState({
     id: "",
     isActive: "",
-    currentUser: "", //current attached user to that cart
+    currentUser: "", 
   });
 
-  // Fetch products and users from the backend
   useEffect(() => {
     setLoader(true);
     fetch(`${BACKEND_SERVER_URL}/admin/product/get-all`, {
@@ -76,7 +76,6 @@ export default function AdminPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        // console.log(data);
         setUsers(data);
       })
       .catch((err) => {
@@ -383,6 +382,34 @@ useEffect(() => {
       imageUrl.forEach((img) => URL.revokeObjectURL(img.imageUrl));
   };
 }, []);
+
+const fetchRefunds = async () => {
+  setLoader(true);
+  try {
+    const response = await fetch(`${BACKEND_SERVER_URL}/api/get-initiated-refunds`, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt_token"),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    setRefunds(data.success);
+  } catch (err) {
+    setLoader(err.message);
+    console.error("Error fetching refunds:", err);
+  } finally {
+    setLoader(false);
+  }
+};
+
+useEffect(() => {
+  fetchRefunds();
+}, []);
    
 
   return (
@@ -396,435 +423,36 @@ useEffect(() => {
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
         {activeProp==='users' && (
-          <>
-        {/* User Table Section */}
-        <div className="flex justify-between items-center mb-4 ">
-          <h2 className="text-xl font-semibold ml-8">Users</h2>
-          <button
-            onClick={handleAddUser}
-            className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded flex items-center"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add User
-          </button>
-        </div>
-
-        {/* Scrollable User Table */}
-        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
-          {users.length > 0 ? (
-            <table className="min-w-full table-auto text-white font-bold">
-              {/* Table Header */}
-              <thead>
-                <tr className="border-b border-gray-600 bg-[#1D4046]">
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Created At
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Updated At
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Email
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Password
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Role
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider ">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body */}
-              <tbody>
-                {users.map((user, index) => (
-                  <tr
-                    key={user.email}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
-                    } hover:bg-[#1B3438] font-mono font-light`}
-                  >
-                    <td className="py-3 px-4 ">{formatDateTime(user.createdAt)}</td>
-                    <td className="py-3 px-4 ">{formatDateTime(user.updatedAt)}</td>
-                    <td className="py-3 px-4 ">{user.email}</td>
-                    <td className="py-3 px-4 ">
-                      {user.password.slice(6, 20)}...
-                    </td>
-                    <td className="py-3 px-4 ">{user.role}</td>
-                    <td className="py-3 px-4 flex space-x-3">
-                      <button
-                        onClick={() => handleEditUser(user)}
-                        className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
-                      >
-                        <Pencil className="h-4 w-4 mr-1" /> Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.email)}
-                        className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" /> Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <h1 className="text-center text-lg text-gray-400 py-4">
-              No Users Found
-            </h1>
-          )}
-        </div>
-        </>
-        )}
-
-        {activeProp==='products' && (
-          <>
-        {/* Product Table Section */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold ml-8">Products</h2>
-          
-          <button
-            onClick={handleAddProduct}
-            className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </button>
-        </div>
-
-        {/* Scrollable Product Table */}
-        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
-          {products.length > 0 ? (
-            <table className="min-w-full table-auto text-white">
-              {/* Table Header */}
-              <thead>
-                <tr className="border-b border-gray-600 bg-[#1D4046]">
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Created At
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Updated At
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Product Name
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Price
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Category
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Quantity
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    QR Code
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    RFID Tag
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body */}
-              <tbody>
-                {products.map((product, index) => (
-                  <tr
-                    key={product.id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
-                    } hover:bg-[#1B3438] font-mono font-light`}
-                  >
-                    
-                    <td className="py-3 px-4">{formatDateTime(product.createdAt) || "NA"}</td>
-                    <td className="py-3 px-4">{formatDateTime(product.updatedAt) || "NA"}</td>
-                    <td className="py-3 px-4">{product.name || "NA"}</td>
-                    <td className="py-3 px-4">₹{product.price || "NA"}</td>
-                    <td className="py-3 px-4">{product.category || "NA"}</td>
-                    <td className="py-3 px-4">{product.quantity || "NA"}</td>
-                    <td className="py-3 px-4">
-                      <a
-                        href={`${BACKEND_SERVER_URL}/product/qr/${product.id}`}
-                      >
-                        <img
-                          className="w-10 h-8 "
-                          src="/images/qr-scan.jpg"
-                          alt="qr code"
-                        />
-                      </a>
-                    </td>
-
-                    <td className="py-3 px-4">{product.rfidTag}</td>
-                    <td className="py-3 px-4 flex space-x-3">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="bg-yellow-500 text-white py-1 px-3 rounded-md flex items-center hover:bg-yellow-400 transition"
-                      >
-                        <Pencil className="h-4 w-4 mr-1" /> Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" /> Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <h1 className="text-center text-lg text-gray-400 py-4">
-              No Products Found
-            </h1>
-          )}
-        </div>
-        </>
-
-        )}
-
-
-        {activeProp==='carts' && (
-          <>
-        {/* StoreCart Table Section */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold ml-8">Store Carts</h2>
-          <button
-            onClick={handleAddStoreCart}
-            className="bg-[#58cbeb] font-bold text-white py-2 px-4 rounded-md flex items-center hover:bg-[#47b7d4] transition"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Generate New Store Cart
-          </button>
-        </div>
-
-        {/* Scrollable Product Table */}
-        <div className="overflow-y-scroll h-[70vh] bg-[#254E58] shadow-md rounded-lg mb-4">
-          {storeCarts.length > 0 ? (
-            <table className="min-w-full table-auto text-white">
-              {/* Table Header */}
-              <thead>
-                <tr className="border-b border-gray-600 bg-[#1D4046]">
-                <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Created At
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    StoreCart Id
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    is Active
-                  </th>
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Currently Attached User
-                  </th>
-
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    QR Code
-                  </th>
-
-                  <th className="py-3 px-4 text-left uppercase tracking-wider font-bold">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              {/* Table Body */}
-              <tbody>
-                {storeCarts.map((storeCart, index) => (
-                  <tr
-                    key={storeCart.id}
-                    className={`${
-                      index % 2 === 0 ? "bg-[#2E5A62]" : "bg-[#254E58]"
-                    } hover:bg-[#1B3438] font-mono font-light`}
-                  >
-                    
-                    <td className="py-3 px-4">{formatDateTime(storeCart.createdAt) || "NA"}</td>
-                    <td className="py-3 px-4">{storeCart.id || "NA"}</td>
-                    <td className="py-3 px-4">
-                      {storeCart.active ? "YES" : "NO" || "NA"}
-                    </td>
-                    <td className="py-3 px-4">
-                      {storeCart.currentUser ? storeCart.currentUser.email:'NA' }
-                    </td>
-                    <td className="py-3 px-4">
-                      <a
-                        href={`${BACKEND_SERVER_URL}/store-cart/qr/${storeCart.id}`}
-                      >
-                        <img
-                          className="w-10 h-8 "
-                          src="/images/qr-scan.jpg"
-                          alt="qr code"
-                        />
-                      </a>
-                    </td>
-
-                    <td className="py-3 px-4 flex space-x-3">
-                
-                      <button
-                        onClick={() => handleDeleteStoreCart(storeCart.id)}
-                        className="bg-red-600 text-white py-1 px-3 rounded-md flex items-center hover:bg-red-500 transition"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" /> Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <h1 className="text-center text-lg text-gray-400 py-4">
-              No Store Carts Found
-            </h1>
-          )}
-        </div>
-
-        </>
-        )}
-
-        {activeProp === 'surveillance' && 
-         <div className="p-4">
-         <h2 className="text-lg font-bold mb-4">Surveillance Images</h2>
-         
-         {/* Scrollable Container */}
-         <div className="h-[400px] overflow-y-auto border p-4 rounded-lg shadow-md">
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-             {imageUrl.map((img) => (
-               <div key={img.id} className="border p-4 rounded-lg shadow-md w-full max-w-xs mx-auto">
-                 <div className="flex justify-center">
-                   <img
-                     src={img.imageUrl}
-                     alt={`Camera ${img.id}`}
-                     className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-md"
-                   />
-                 </div>
-                 <p className="mt-2 text-sm sm:text-base text-gray-600">
-                   <span className="font-bold text-purple-600">🆔 Camera ID:</span> {img.id}
-                 </p>
-                 <p className="text-xs sm:text-sm text-gray-500">📅 Date & Time: {img.updatedAt}</p>
-                 <p className="text-red-600 font-bold mt-2">⚠ Security Threat Detected:</p>
-                 <p className="text-red-500">{img.description}</p>
-               </div>
-             ))}
-           </div>
-         </div>
-       </div>
-       
-        }
+          <UserPage  users = {users} handleAddUser={handleAddUser} handleDeleteUser={handleDeleteUser} 
+          handleEditUser={handleEditUser} formatDateFn={formatDateTime}/>
         
-        
-
-
-
-
-    {activeProp === "reports" && (
-  <div className="flex justify-center items-center w-full h-auto p-6">
-    <div className="max-w-6xl mx-auto w-full">
-      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Report</h1>
-
-      {/* Table of Sold Items */}
-      <div className="bg-white shadow-md p-6 rounded-lg mt-6">
-
-        {reportData && Object.keys(reportData).length > 0 ? (
-          <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
-            <thead>
-              <tr className="bg-[#1D4046] text-white">
-                <th className="border border-gray-300 p-2">Product Name</th>
-                <th className="border border-gray-300 p-2">Category</th>
-                <th className="border border-gray-300 p-2">Price</th>
-                <th className="border border-gray-300 p-2">Total Sold</th>
-                <th className="border border-gray-300 p-2">Stock Left</th>
-                <th className="border border-gray-300 p-2">Total Revenue</th>
-                <th className="border border-gray-300 p-2">Last Sold Quantity</th>
-                <th className="border border-gray-300 p-2">Last Sold Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(reportData).map((key) => {
-                const item = reportData[key];
-                const lastSale = item.timeStampsAndQuantitySold?.[item.timeStampsAndQuantitySold.length - 1] || {};
-                const lastSoldTime = Object.keys(lastSale)[0] || "N/A";
-                const lastSoldQuantity = lastSale[lastSoldTime] || "N/A";
-                
-                return (
-                  <tr key={key} className="text-center border-t border-gray-300">
-                    <td className="border border-gray-300 p-2">{item.productName}</td>
-                    <td className="border border-gray-300 p-2">{item.category}</td>
-                    <td className="border border-gray-300 p-2">₹{item.productPrice}</td>
-                    <td className="border border-gray-300 p-2">{item.totalQuantitySold}</td>
-                    <td className="border border-gray-300 p-2">{item.quantityLeftInStock}</td>
-                    <td className="border border-gray-300 p-2">₹{item.totalSoldAmount}</td>
-                    <td className="border border-gray-300 p-2">{lastSoldQuantity}</td>
-                    <td className="border border-gray-300 p-2">{formatDateTime(lastSoldTime)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-center text-gray-500">No sales data available</p>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
- {activeProp === "salesDashboard" && (
-  <div className="flex justify-center items-center w-full h-auto p-6">
-    <div className="max-w-6xl mx-auto w-full">
-      <h1 className="text-2xl font-bold mt-6 mb-4 text-center">📊 Sales Dashboard</h1>
-
-      {/* Grid Layout for Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Sales Trends Chart */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sales Trends</h2>
-          <SalesChart salesData={reportData} />
-        </div>
-
-        {/* Max/Min Sold Items Chart */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Best & Worst Selling Products</h2>
-          <MaxMinSoldChart salesData={reportData} />
-        </div>
-
-        {/* Sales by Date */}
-        <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sales on Selected Date</h2>
-          <SalesByDate salesData={reportData} />
-        </div>
-      
-
-      {/* Items Left in Stock by Category */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Items Left in Stock by Category</h2>
-          <StockByCategoryChart salesData={reportData} />
-      </div>
-      
-
-      {/* Sold Products by Category */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Sold Products by Category</h2>
-          <SoldByCategoryChart salesData={reportData} />
-      </div>
-
-      {/* Revenue on Selected Date */}
-      <div className="bg-white shadow-md p-4 rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">Revenue on Selected Date</h2>
-          <RevenueByDate salesData={reportData} />
-      </div>
-      </div>
-      </div>
-      </div>
         )}
 
+      {activeProp==='products' && (
+        <ProductPage products = {products} handleAddProduct = {handleAddProduct} 
+        handleEditProduct={handleEditProduct} handleDeleteProduct={handleDeleteProduct} formatDateFn={formatDateTime}/>
+      )}
 
+      {activeProp==='carts' && (
+        <CartPage storeCarts = {storeCarts} handleAddStoreCart = {handleAddStoreCart} 
+        handleDeleteStoreCart={handleDeleteStoreCart} formatDateFn = {formatDateTime}/>
+ 
+      )}
+
+      {activeProp === 'surveillance' && 
+        <SurveillancePage imageUrl = {imageUrl}/>
+      }
+      {activeProp === "reports" && (
+        <ReportPage reportData = {reportData} formatDateFn = {formatDateTime} />
+      )}
+
+      {activeProp === "salesDashboard" && (
+        <SalesPage reportData = {reportData}/>
+      )}
+
+      {activeProp === "Refund" && (
+        <RefundPage refundData = {refunds} />
+      )}
 
         {/* Modals for Add/Edit */}
         <UserModal
@@ -842,11 +470,7 @@ useEffect(() => {
           setNewProduct={setNewProduct}
           handleSaveProduct={handleSaveProduct}
         />
-
-      
       </div>
-      
-
       </div>
     </>
   );

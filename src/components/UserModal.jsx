@@ -4,7 +4,6 @@ export default function UserModal({ isOpen, setIsOpen, newUser, setNewUser, hand
   const [roleError, setRoleError] = useState(true);
   const [emailError, setEmailError] = useState(true);
   useEffect(() => {
-    // Validate email when newUser.email changes
     if (newUser.email && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(newUser.email)) {
       setEmailError(true);
     } else {
@@ -21,7 +20,7 @@ export default function UserModal({ isOpen, setIsOpen, newUser, setNewUser, hand
   };
   const handleSave = () => {
     if (!emailError && !roleError) {
-      handleSaveUser(); // Call the parent component's handleSaveUser function
+      handleSaveUser();
     }
   };
   return (
