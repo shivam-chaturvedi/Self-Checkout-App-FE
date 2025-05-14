@@ -16,7 +16,6 @@ import UserPage from "../components/UserPage";
 export default function AdminPage() {
   const [products, setProducts] = useState([]);
   const [refunds, setRefunds] = useState([]);
-  const [refunds, setRefunds] = useState([]);
   const [users, setUsers] = useState([]);
   const [storeCarts, setStoreCarts] = useState([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -418,11 +417,12 @@ useEffect(() => {
     <>
       {loader && <LoaderComponent />}
       <div className="flex m-1">
-        
-      <Sidebar active={activeProp} setActiveProp={setActiveProp}/>
+        <Sidebar active={activeProp} setActiveProp={setActiveProp}/>
+      
       
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+        
 
         {activeProp==='users' && (
           <UserPage  users = {users} handleAddUser={handleAddUser} handleDeleteUser={handleDeleteUser} 

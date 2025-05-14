@@ -4,11 +4,16 @@ import { GiCctvCamera } from "react-icons/gi";
 const Sidebar = ({ active, setActiveProp }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
 
+  const handleMenuClick = (menu) => {
+    setActiveProp(menu);
+    setIsSidebarOpen(false); // Close sidebar on mobile
+  };
+
   return (
     <div>
       {/* Burger Menu Button */}
       <button
-        className="p-1 w-10 md:hidden bg-black text-white fixed top-32 left-0 z-50"
+        className="p-1 w-10 md:hidden text-black text-2xl fixed top-[75px] right-0 z-20"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         ☰
@@ -16,7 +21,7 @@ const Sidebar = ({ active, setActiveProp }) => {
 
       {/* Sidebar */}
       <div
-        className={`h-screen top-0 fixed w-72 z-40 bg-black text-white flex flex-col transition-transform duration-300 ${
+        className={`h-screen top-0 fixed w-72 z-20 bg-black text-white flex flex-col transition-transform duration-300 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 md:relative`}
       >
@@ -60,9 +65,7 @@ const Sidebar = ({ active, setActiveProp }) => {
         <nav className="flex-grow">
           <ul>
             <li
-              onClick={() => {
-                setActiveProp("users");
-              }}
+              onClick={() => handleMenuClick("users")}
               className={
                 active === "users"
                   ? "p-4 hover:bg-purple-700 bg-green-900 mt-5"
@@ -70,18 +73,16 @@ const Sidebar = ({ active, setActiveProp }) => {
               }
             >
               <button className="flex items-center space-x-3">
-                <span className="text-xl ">👥</span>
+                <span className="text-xl">👥</span>
                 <span>Manage Users</span>
               </button>
             </li>
             <li
-              onClick={() => {
-                setActiveProp("products");
-              }}
+              onClick={() => handleMenuClick("products")}
               className={
                 active === "products"
                   ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 "
+                  : "p-4 hover:bg-purple-700"
               }
             >
               <button className="flex items-center space-x-3">
@@ -90,13 +91,11 @@ const Sidebar = ({ active, setActiveProp }) => {
               </button>
             </li>
             <li
-              onClick={() => {
-                setActiveProp("carts");
-              }}
+              onClick={() => handleMenuClick("carts")}
               className={
                 active === "carts"
                   ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 "
+                  : "p-4 hover:bg-purple-700"
               }
             >
               <button className="flex items-center space-x-3">
@@ -105,13 +104,11 @@ const Sidebar = ({ active, setActiveProp }) => {
               </button>
             </li>
             <li
-              onClick={() => {
-                setActiveProp("reports");
-              }}
+              onClick={() => handleMenuClick("reports")}
               className={
                 active === "reports"
                   ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 "
+                  : "p-4 hover:bg-purple-700"
               }
             >
               <button className="flex items-center space-x-3">
@@ -119,51 +116,44 @@ const Sidebar = ({ active, setActiveProp }) => {
                 <span>Reports</span>
               </button>
             </li>
-
-
-
             <li
-  onClick={() => {
-    setActiveProp("salesDashboard");
-  }}
-  className={
-    active === "salesDashboard"
-                  ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 "
-  }
->
-  <button className="flex items-center space-x-3">
-    <span className="text-xl">📈</span>
-    <span>Sales Dashboard</span>
-  </button>
-</li>
-<li
-              onClick={() => {
-                setActiveProp("surveillance");
-              }}
+              onClick={() => handleMenuClick("salesDashboard")}
               className={
-                active === "surveillance"
+                active === "salesDashboard"
                   ? "p-4 hover:bg-purple-700 bg-green-900"
-                  : "p-4 hover:bg-purple-700 "
+                  : "p-4 hover:bg-purple-700"
               }
             >
               <button className="flex items-center space-x-3">
-                <span className="text-xl "><GiCctvCamera /></span>
+                <span className="text-xl">📈</span>
+                <span>Sales Dashboard</span>
+              </button>
+            </li>
+            <li
+              onClick={() => handleMenuClick("surveillance")}
+              className={
+                active === "surveillance"
+                  ? "p-4 hover:bg-purple-700 bg-green-900"
+                  : "p-4 hover:bg-purple-700"
+              }
+            >
+              <button className="flex items-center space-x-3">
+                <span className="text-xl">
+                  <GiCctvCamera />
+                </span>
                 <span>Surveillance</span>
               </button>
             </li>
             <li
-              onClick={() => {
-                setActiveProp("Refund");
-              }}
+              onClick={() => handleMenuClick("Refund")}
               className={
                 active === "Refund"
                   ? "p-4 px-3 hover:bg-purple-700 bg-green-900"
-                  : "p-4 px-3 hover:bg-purple-700 "
+                  : "p-4 px-3 hover:bg-purple-700"
               }
             >
               <button className="flex items-center space-x-3">
-                <span className="text-xl ">👥</span>
+                <span className="text-xl">👥</span>
                 <span>Track Refunds</span>
               </button>
             </li>
@@ -174,7 +164,7 @@ const Sidebar = ({ active, setActiveProp }) => {
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black opacity-50 z-10 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
